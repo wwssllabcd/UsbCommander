@@ -19,7 +19,7 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支援
-
+    BOOL PreTranslateMessage(MSG* pMsg);
     void init_var();
 
 // 程式碼實作
@@ -32,4 +32,10 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnCbnSelchangeCboCmdSelect();
+    afx_msg void OnBnClickedBtnRefresh();
+    afx_msg void OnBnClickedBtnExecute();
+    afx_msg void OnBnClickedbtnseqstart();
+    afx_msg void OnBnClickedbtnrdmstart();
 };

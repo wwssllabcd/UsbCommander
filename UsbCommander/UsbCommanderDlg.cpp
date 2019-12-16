@@ -7,6 +7,11 @@
 #include "UsbCommanderDlg.h"
 #include "afxdialogex.h"
 
+#include "UsbCmder/CmderCtrller.h"
+#include "Utility/Observer.h"
+#include "Utility/EricException.h"
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -64,37 +69,60 @@ BEGIN_MESSAGE_MAP(CUsbCommanderDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+    ON_CBN_SELCHANGE(IDC_CBO_CMD_SELECT, &CUsbCommanderDlg::OnCbnSelchangeCboCmdSelect)
+    ON_BN_CLICKED(IDC_BTN_REFRESH, &CUsbCommanderDlg::OnBnClickedBtnRefresh)
+    ON_BN_CLICKED(IDC_BTN_EXECUTE, &CUsbCommanderDlg::OnBnClickedBtnExecute)
+    ON_BN_CLICKED(IDC_btnSeqStart, &CUsbCommanderDlg::OnBnClickedbtnseqstart)
+    ON_BN_CLICKED(IDC_btnRdmStart, &CUsbCommanderDlg::OnBnClickedbtnrdmstart)
 END_MESSAGE_MAP()
 
 
-typedef struct {
-    int cdb[16];
-    int devceSel;
-    int refresh;
-    int execute;
-    int cmdSel;
-    int dataIn;
-    int dataOut;
-    int dataLen;
-    int message;
-}UsbCmderNum;
-UsbCmderNum m_usbcmderNum;
-void CUsbCommanderDlg::init_var()
-{
-    for (int i = 0; i < 16; i++) {
-        m_usbcmderNum.cdb[i] = IDC_CDB_00 + i;
+CmderCtrller m_ctrler;
+void dialogShowMsg(estring& tmsg, bool isClean) {
+    m_ctrler.m_view.sendMsgToDialogArea(isClean, tmsg);
+}
+
+void CUsbCommanderDlg::init_var(){
+    UsbCmderMfcUiNum cmderNumObj;
+    for (int i = 0; i < MAX_CDB_OF_UI; i++) {
+        cmderNumObj.cdb[i] = IDC_CDB_00 + i;
     }
     
-    m_usbcmderNum.devceSel = IDC_CBO_DRIVE_SEL;
-    m_usbcmderNum.refresh = IDC_BTN_REFRESH;
-    m_usbcmderNum.execute = IDC_BTN_EXECUTE;
-    m_usbcmderNum.cmdSel = IDC_CBO_CMD_SELECT;
-    m_usbcmderNum.dataIn = IDC_RDO_DATA_IN;
-    m_usbcmderNum.dataOut = IDC_RDO_DATA_OUT;
-    m_usbcmderNum.dataLen = IDC_TXT_DATA_LENGTH;
-    m_usbcmderNum.message = IDC_TXT_MAIN_MSG;
+    cmderNumObj.devceSel = IDC_CBO_DRIVE_SEL;
+    cmderNumObj.refresh = IDC_BTN_REFRESH;
+    cmderNumObj.execute = IDC_BTN_EXECUTE;
+    cmderNumObj.cmdSel = IDC_CBO_CMD_SELECT;
+    cmderNumObj.dataIn = IDC_RDO_DATA_IN;
+    cmderNumObj.dataOut = IDC_RDO_DATA_OUT;
+    cmderNumObj.dataLen = IDC_TXT_DATA_LENGTH;
+    cmderNumObj.message = IDC_TXT_MAIN_MSG;
 
+    m_ctrler.m_view.setDlgPointer(this);
+    m_ctrler.m_view.setup_ui_num_to_view(&cmderNumObj);
 
+    SeqWriteUiNum seqNumObj;
+    seqNumObj.startLba = IDC_txtSeqStartLba;
+    seqNumObj.endLba = IDC_txtSeqEndLba;
+    seqNumObj.secCnt = IDC_txtSeqSecCnt;
+    seqNumObj.lbaStep = IDC_txtSeqLbaStep;
+    seqNumObj.noRead = IDC_btnNoRead;
+    seqNumObj.noWrite = IDC_btnNoWrite;
+    seqNumObj.stop = IDC_btnStop;
+
+    m_ctrler.m_view.m_seqWriteUi.set_ui_item(this, &seqNumObj);
+
+    RdmWriteUiNum rdmNumObj;
+    rdmNumObj.startLba = IDC_txtSeqStartLba;
+    rdmNumObj.endLba = IDC_txtSeqEndLba;
+    rdmNumObj.stop = IDC_btnStop;
+    rdmNumObj.ramdomSeed = IDC_txtRdmSeed;
+    rdmNumObj.stopAt = IDC_txtStopAt;
+    rdmNumObj.isPending = IDC_btnRdmIsPending;
+    rdmNumObj.isFake = IDC_btnRdmIsFake;
+    m_ctrler.m_view.m_rdmWriteUi.set_ui_item(this, &rdmNumObj);
+
+    m_ctrler.init();
+    Observer::observerRegister(0, &dialogShowMsg);
 }
 // CUsbCommanderDlg 訊息處理常式
 
@@ -178,8 +206,55 @@ void CUsbCommanderDlg::OnPaint()
 
 // 當使用者拖曳最小化視窗時，
 // 系統呼叫這個功能取得游標顯示。
-HCURSOR CUsbCommanderDlg::OnQueryDragIcon()
-{
+HCURSOR CUsbCommanderDlg::OnQueryDragIcon(){
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CUsbCommanderDlg::OnCbnSelchangeCboCmdSelect(){
+    m_ctrler.m_view.selectChange();
+}
+
+void CUsbCommanderDlg::OnBnClickedBtnRefresh(){
+    m_ctrler.refresh();
+}
+
+void CUsbCommanderDlg::OnBnClickedBtnExecute(){
+    m_ctrler.execute();
+}
+
+BOOL CUsbCommanderDlg::PreTranslateMessage(MSG* pMsg) {
+    if (pMsg->message == WM_KEYDOWN) {
+        switch (pMsg->wParam) {
+        case VK_PRIOR:
+            m_ctrler.pageUp();
+            UpdateWindow();
+            break;
+        case VK_NEXT:
+            m_ctrler.pageDown();
+            UpdateWindow();
+            break;
+        }
+    }
+    return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CUsbCommanderDlg::OnBnClickedbtnseqstart()
+{
+    // TODO: 在此加入控制項告知處理常式程式碼
+    try {
+        m_ctrler.squenceWrite();
+    } catch (EricException& my_ex) {
+        AfxMessageBox(my_ex.what());
+    }
+}
+
+
+void CUsbCommanderDlg::OnBnClickedbtnrdmstart()
+{
+    // TODO: 在此加入控制項告知處理常式程式碼
+    try {
+        m_ctrler.randomWrite();
+    } catch (EricException& my_ex) {
+        AfxMessageBox(my_ex.what());
+    }
+}
