@@ -29,7 +29,7 @@ void CmderView::init(void) {
 }
 
 void CmderView::setup_ui_item(int deviceSel, int cmdSel, int* srcId_cdb,
-    int dataOut, int dataIn, int dataLen, int mainMsg)
+    int dataOut, int dataIn, int dataLen, int mainMsg, int asciiMsg, int sysInfo)
 {
     for (int i = 0; i < MAX_CDB_OF_UI; i++) {
         m_cdbs[i] = m_du.getDlgItemPtr<CEdit>(m_pDialog, srcId_cdb[i]);
@@ -40,7 +40,11 @@ void CmderView::setup_ui_item(int deviceSel, int cmdSel, int* srcId_cdb,
     m_pDataLen = m_du.getDlgItemPtr<CEdit>(m_pDialog, dataLen);
     m_pDataIn = m_du.getDlgItemPtr<CButton>(m_pDialog, dataIn);
     m_pDataOut = m_du.getDlgItemPtr<CButton>(m_pDialog, dataOut);
-    m_dialogMsg = m_du.getDlgItemPtr<CEdit>(m_pDialog, mainMsg);
+	m_dialogMsg = m_du.getDlgItemPtr<CEdit>(m_pDialog, mainMsg);
+	
+	m_asciiMsg = m_du.getDlgItemPtr<CEdit>(m_pDialog, asciiMsg);
+
+	m_lblSysMsg = m_du.getDlgItemPtr<CStatic>(m_pDialog, sysInfo);
 }
 
 void CmderView::setup_ui_num_to_view(UsbCmderMfcUiNum* const uiNumObj) {
@@ -51,7 +55,9 @@ void CmderView::setup_ui_num_to_view(UsbCmderMfcUiNum* const uiNumObj) {
         , uiNumObj->dataOut
         , uiNumObj->dataIn
         , uiNumObj->dataLen
-        , uiNumObj->message
+		, uiNumObj->message
+		, uiNumObj->asciiMessage
+		, uiNumObj->sysInfo
     );
 }
 
@@ -78,9 +84,10 @@ eu8 CmderView::getDirectionFromUi(void) {
 	return 0;
 }
 
-void CmderView::setDataLenToUi(int length) {
-    Utility su;
-	m_pDataLen->SetWindowText(su.toHexString((eu32)length).c_str());
+void CmderView::setDataLenToUi(eu32 length) {
+    Utility u;
+	estring res = u.toHexString(length);
+	m_pDataLen->SetWindowText(res.c_str());
 }
 
 int CmderView::getDataLenFromUi() {
@@ -117,6 +124,11 @@ void CmderView::setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl) {
 	if (partialSetCtrl& BIT_13) {
 		setDirectionToUi(objCmd.direction);
 	}
+}
+
+void CmderView::driveSelectChange() {
+	estring res = m_du.getText(m_cboDriveSel);
+	m_du.setText(m_lblSysMsg, res);
 }
 
 void CmderView::selectChange() {
@@ -187,11 +199,14 @@ void CmderView::closeCheckBtn(void) {
 	this->m_rdmWriteUi.stop();
 }
 
-void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring msg) {
+void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring_cr msg) {
 	//init
 	if(isClean) {
 		pMsgArea->SetWindowText(msg.c_str());
-		pMsgArea->RedrawWindow();
+		
+		
+
+	
 	} else {
 		int end = pMsgArea->GetWindowTextLength();
 		pMsgArea->SetSel(end, end);
@@ -199,10 +214,14 @@ void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring msg) {
 	}
 }
 
-void CmderView::sendMsgToDialogArea(bool isClean, estring msg) {
+void CmderView::sendMsgToDialogArea(bool isClean, estring_cr msg) {
 	sendMsgBase(this->m_dialogMsg, isClean, msg);
 }
 
-void CmderView::sendMsgToAsciiArea(bool isClean, estring msg) {
+void CmderView::sendMsgToAsciiArea(bool isClean, estring_cr msg) {
 	sendMsgBase(this->m_asciiMsg, isClean, msg);
+}
+
+void CmderView::showPopupWindows(estring_cr msg) {
+	this->m_pDialog->MessageBox(msg.c_str());
 }

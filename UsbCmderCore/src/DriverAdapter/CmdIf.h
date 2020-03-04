@@ -26,7 +26,7 @@ public:
     int m_type;
 
 private:
-    void send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring desc) const;
+    void send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const;
 
     eu8 m_fakeDevice[_128K];
 };

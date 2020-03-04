@@ -24,8 +24,8 @@ public:
 	~SequenceWriteUi();
     void set_ui_item(CDialog* dialog, SeqWriteUiNum_p numOjb);
 	void setItem(CEdit* startLba, CEdit* endLba, CEdit* secCnt, CEdit* step, CButton* noRead, CButton* noWrite, CButton* stop);
-	void setDefaultValue(estring startLba, estring endLba, estring secCnt, estring step);
-	void setEndLba(estring endLba);
+	void setDefaultValue(estring_cr startLba, estring_cr endLba, estring_cr secCnt, estring_cr step);
+	void setEndLba(estring_cr endLba);
 	
 	eu32 getStartLba();
 	eu32 getEndLba();

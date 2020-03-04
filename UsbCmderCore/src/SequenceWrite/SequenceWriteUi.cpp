@@ -16,11 +16,7 @@ SequenceWriteUi::SequenceWriteUi()
 SequenceWriteUi::~SequenceWriteUi() {
 }
 
-void SequenceWriteUi::setEndLba(estring endLba) {
-	m_du.setText(m_endLba, endLba);
-}
-
-void SequenceWriteUi::setDefaultValue(estring startLba, estring endLba, estring secCnt, estring step) {
+void SequenceWriteUi::setDefaultValue(estring_cr startLba, estring_cr endLba, estring_cr secCnt, estring_cr step) {
     m_du.setText(m_startLba, startLba);
     m_du.setText(m_endLba, endLba);
     m_du.setText(m_secCnt, secCnt);
@@ -36,7 +32,7 @@ void SequenceWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* secCnt, CEd
     m_noWrite = noWrite;
     m_stop = stop;
 
-    setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("80"), _ET("80"));
+    setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("20"), _ET("20"));
 }
 
 void SequenceWriteUi::set_ui_item(CDialog* dialog, SeqWriteUiNum_p numOjb) {
@@ -59,6 +55,10 @@ eu32 SequenceWriteUi::getStartLba() {
 
 eu32 SequenceWriteUi::getEndLba() {
     return m_du.getHexValue(m_endLba);
+}
+
+void SequenceWriteUi::setEndLba(estring_cr endLba) {
+	m_du.setText(m_endLba, endLba);
 }
 
 eu32 SequenceWriteUi::getStep() {

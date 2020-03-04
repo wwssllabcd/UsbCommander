@@ -11,6 +11,8 @@ class UsbCmdStruct;
 
 typedef vector<UsbCmdStruct> UsbCmdSet;
 
+#define BYTE_PER_LBA_UNIT           (4096)
+
 class UsbCmdStruct
 {
 public:

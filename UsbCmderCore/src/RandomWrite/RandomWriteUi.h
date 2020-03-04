@@ -12,7 +12,8 @@ typedef struct {
     int stopAt;
     int stop;
     int isPending;
-    int isFake;
+	int isFake;
+	int isNoRead;
 }RdmWriteUiNum;
 ERIC_GEN_OTHER_TYPE(RdmWriteUiNum);
 
@@ -32,8 +33,9 @@ public:
 	bool isFake();
 	void setPending();
 	void stop();
+	bool isNoRead();
 
-	void setItem(CEdit* startLba, CEdit* endLba, CEdit* ramdomSeed, CEdit* stopAt,  CButton* stop, CButton* isPending, CButton* isFake);
+	void setItem(CEdit* startLba, CEdit* endLba, CEdit* ramdomSeed, CEdit* stopAt,  CButton* stop, CButton* isPending, CButton* isFake, CButton* isNoRead);
     void set_ui_item(CDialog* dialog, RdmWriteUiNum_p numOjb);
 private:
 	
@@ -47,6 +49,8 @@ private:
 	CButton* m_stop;
 	CButton* m_isPending;
 	CButton* m_fake;
+
+	CButton* m_isNoRead;
 
 	DialogUtility m_du;
 	Utility m_u;

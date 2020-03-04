@@ -3,27 +3,27 @@
 #include "stdafx.h"
 #include "CmdIf.h"
 
-//#define _ENABLE_DEVICE_CTRL_
+#define _ENABLE_DEVICE_CTRL_
 
 #ifdef _ENABLE_DEVICE_CTRL_
 
 #include "Drive/DriveService.h"
 #include "Drive/UsbCommand.h"
 #include "Drive/Drive.h"
+#include "Utility/EricException.h"
 
-#include "Exception/MyException.h"
 using namespace EricCore;
 
-void CmdIf::send_cmd(eu8* cdb, eu8* buffer, int Length, eu8 direction, estring desc) const {
+void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const {
     DriveService* ds = DriveService::getInstance();
 
     if (m_curSel == -1) {
-        throw MyException(0, _ET("cursel = -1"));
+		THROW_MYEXCEPTION(0, _ET("cursel = -1"));
     }
 
     Drive objDrive = ds->getIdelDeviceById(m_curSel);
     UsbCommand usbCmd(objDrive.address);
-    usbCmd.sendCommand(cdb, buffer, Length, direction, desc);
+    usbCmd.sendCommand(cdb, buffer, byteCnt, direction, desc);
 }
 
 vector<estring> CmdIf::get_device_name(void) {

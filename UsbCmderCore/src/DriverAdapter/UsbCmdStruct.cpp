@@ -110,7 +110,7 @@ UsbCmdStruct UsbCmdStruct::read10(void) {
 	UsbCmdStruct usbCmdSet;
 	usbCmdSet.cdb[0] = 0x28;
 	usbCmdSet.cdb[8] = 1;
-	usbCmdSet.length = 512;
+	usbCmdSet.length = BYTE_PER_LBA_UNIT;
 	usbCmdSet.direction = FLAG_DATA_IN;
 	usbCmdSet.description = _ET("UFI: Read(10)");
 	return usbCmdSet;
@@ -125,7 +125,7 @@ UsbCmdStruct UsbCmdStruct::read10(eu32 lba, eu16 secCnt) {
 	usbCmdSet.cdb[5] = (eu8)((lba >> 0x00) & 0xFF);
 	usbCmdSet.cdb[7] = (secCnt >> 0x08) & 0xFF;
 	usbCmdSet.cdb[8] = (secCnt >> 0x00) & 0xFF;
-	usbCmdSet.length = secCnt * 0x200;
+	usbCmdSet.length = secCnt * BYTE_PER_LBA_UNIT;
 	return usbCmdSet;
 }
 
@@ -133,7 +133,7 @@ UsbCmdStruct UsbCmdStruct::write10(void) {
 	UsbCmdStruct usbCmdSet;
 	usbCmdSet.cdb[0] = 0x2a;
 	usbCmdSet.cdb[8] = 1;
-	usbCmdSet.length = 512;
+	usbCmdSet.length = BYTE_PER_LBA_UNIT;
 	usbCmdSet.direction = FLAG_DATA_OUT;
 	usbCmdSet.description = _ET("UFI: Write(10)");
 	return usbCmdSet;
@@ -148,7 +148,7 @@ UsbCmdStruct UsbCmdStruct::write10(eu32 lba, eu16 secCnt) {
 	usbCmdSet.cdb[5] = (eu8)((lba >> 0x00) & 0xFF);
 	usbCmdSet.cdb[7] = (secCnt >> 0x08) & 0xFF;
 	usbCmdSet.cdb[8] = (secCnt >> 0x00) & 0xFF;
-	usbCmdSet.length = secCnt * 0x200;
+	usbCmdSet.length = secCnt * BYTE_PER_LBA_UNIT;
 	return usbCmdSet;
 }
 

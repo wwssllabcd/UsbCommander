@@ -22,7 +22,7 @@ void RandomWrite::lbaRead(eu32 lba, eu16 cnt, eu8* buf) {
 }
 
 void RandomWrite::vdrReboot() {
-    m_usbCmd.vdrReboot();
+    //m_usbCmd.vdrReboot();
 }
 
 estring RandomWrite::makeHeader(eu32 startLba, eu32 endLba, eu32 seed) {
@@ -141,19 +141,26 @@ void RandomWrite::pendingProcess(RandomWriteUi& ui, eu32 count) {
     }
 }
 
-#define MAX_SEC_LEN (0x100)
+#define DATA_BUFFER_SIZE (_256K)
+#define MAX_SEC_LEN      (0x20)
 void RandomWrite::randomWrite(RandomWriteUi& ui) {
-    eu8 pReadBuf[MAX_SEC_LEN * 512];
-    eu8 pWriteBuf[MAX_SEC_LEN * 512];
+    eu8 pReadBuf[DATA_BUFFER_SIZE];
+    eu8 pWriteBuf[DATA_BUFFER_SIZE];
     eu16 secRange = MAX_SEC_LEN;
     estring titleMsg;
     eu32 startLba = ui.getStartLba();
     eu32 endLba = ui.getEndLba();
-    eu32 extSeed = ui.getSeed();
+	eu32 extSeed = ui.getSeed();
+	bool isNoRead = ui.isNoRead();
+	
 
+	eu32 maxBufLen = secRange * BYTE_PER_LBA_UNIT;
+	if (maxBufLen > sizeof(pReadBuf)) {
+		THROW_MYEXCEPTION(0, _ET("RdmW: buffer OFB"));
+	}
 
     if (endLba == 0) {
-        THROW_MYEXCEPTION(0, _ET("endLba == 0"));
+        THROW_MYEXCEPTION(0, _ET("RdmW: endLba == 0"));
     }
 
     int seed = (unsigned int)time(0);
@@ -194,9 +201,14 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
         eu32 writeLba = getWriteLba(startLba, endLba, secCnt, count);
 
         clearTextArea(titleMsg, count);
-        SEND_MSG(_ET("(%x)W/R LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
 
-        int length = secCnt * 512;
+		if (isNoRead) {
+			SEND_MSG(_ET("(%x)W only LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
+		} else {
+			SEND_MSG(_ET("(%x)W/R LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
+		}
+
+        int length = secCnt * BYTE_PER_LBA_UNIT;
 
         // make buffer
         m_u.makeBuf(writeLba, length, pWriteBuf);
@@ -205,10 +217,9 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 
         if (ui.isFake() == false) {
             lbaWrite(writeLba, secCnt, pWriteBuf);
-            bool wrcflow = true;
 
-            if (wrcflow) {
-                lbaRead(writeLba, secCnt, pReadBuf);
+			if (isNoRead) {
+				lbaRead(writeLba, secCnt, pReadBuf);
                 vdrReboot();
                 lbaRead(writeLba, secCnt, pReadBuf);
                 compareData(pWriteBuf, pReadBuf, length, writeLba);
@@ -217,7 +228,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
             if ((count % 0x40) == 0) {
                 lbaRead(writeLba, secCnt, pReadBuf);
                 vdrReboot();
-                //verifyRecordLba();
+                verifyRecordLba();
             }
         }
         pendingProcess(ui, count);
@@ -231,7 +242,7 @@ void RandomWrite::compareData(eu8* writeBuf, eu8* readBuf, int length, eu32 writ
     int result = memcmp(readBuf, writeBuf, length);
     //印出哪裡有問題
     if (result != 0) {
-        estring msg = _T("..fail");
+        estring msg = _ET("..fail");
         SEND_MSG_STR(msg);
         msg = getDiffStringInTwoBuf(writeLba, length, writeBuf, readBuf);
         SEND_MSG_STR(msg);
@@ -241,8 +252,8 @@ void RandomWrite::compareData(eu8* writeBuf, eu8* readBuf, int length, eu32 writ
 
 void RandomWrite::verifyRecordLba() {
     Utility su;
-    eu8 readBuf[MAX_SEC_LEN * 512];
-    eu8 compBuf[MAX_SEC_LEN * 512];
+    eu8 readBuf[DATA_BUFFER_SIZE];
+    eu8 compBuf[DATA_BUFFER_SIZE];
     eu32 cnt = (eu32)m_lbaColl.size();
     SEND_MSG(_ET("Verify Record Lba count = %X"), cnt);
 
@@ -253,15 +264,17 @@ void RandomWrite::verifyRecordLba() {
 
         lbaRead(lba, secCnt, readBuf);
 
-        // make buffer
-        m_u.makeBuf(lba, secCnt * 512, compBuf);
+		eu32 dataLen = secCnt * BYTE_PER_LBA_UNIT;
 
-        int result = memcmp(readBuf, compBuf, secCnt * 512);
+        // make buffer
+        m_u.makeBuf(lba, dataLen, compBuf);
+
+        int result = memcmp(readBuf, compBuf, dataLen);
         //印出哪裡有問題
         if (result != 0) {
             estring msg = _ET("\r\n--- Verify Record fail step=") + su.toHexString(i);
             msg += _ET("\r\n LBA =") + su.toHexString(lba) + _ET(", len =") + su.toHexString(secCnt);
-            msg += getDiffStringInTwoBuf(lba, secCnt * 512, compBuf, readBuf);
+            msg += getDiffStringInTwoBuf(lba, dataLen, compBuf, readBuf);
             SEND_MSG_STR(msg);
             THROW_MYEXCEPTION(0, _ET("verifyRecordLba error"));
         }

@@ -10,6 +10,7 @@
 
 #include "Utility/Observer.h"
 #include "Utility/Utility.h"
+#include "Utility/EricException.h"
 
 #define NULL_32 (0xFFFFFFFF)
 
@@ -69,11 +70,18 @@ void CmderCtrller::executeUsbCmd(UsbCmdStruct cmd) {
 
     Utility su;
 	estring msg = su.makeHexTable(cmd.length, pc_buffer);
-    SEND_MSG_STR(msg);
+	SEND_MSG_STR_CLEAR(msg);
+
+	estring asciiMsg = su.makeAsciiTable(pc_buffer, cmd.length);
+	m_view.sendMsgToAsciiArea(true, asciiMsg);
 }
 
 void CmderCtrller::execute() {
-	executeUsbCmd(m_view.loadCmdSetFromUI());
+	try {
+		executeUsbCmd(m_view.loadCmdSetFromUI());
+	} catch (EricException& mye) {
+		m_view.showPopupWindows(mye.what());
+	}
 }
 
 CmdIf CmderCtrller::get_cmdif() {
@@ -86,18 +94,24 @@ eu32 CmderCtrller::getCapacity() {
     CmdIf usbCmd = get_cmdif();
 	eu8 buffer[8];
 	usbCmd.readCapacity(buffer);
-    return m_u.toU32(buffer + 2);
+	eu32 res = m_u.toU32(buffer);
+	return res;
+}
+
+void CmderCtrller::seEndLba() {
+	CmderView* view = &m_view;
+	if (view->m_seqWriteUi.getEndLba() == NULL_32) {
+		eu32 strEndLba = getCapacity();
+		Utility u;
+		view->m_seqWriteUi.setEndLba(u.toHexString(strEndLba, _ET("%X")));
+	}
 }
 
 void CmderCtrller::squenceWrite() {
 	CmderView* view = &m_view;
     CmdIf usbCmd = get_cmdif();
+	seEndLba();
 	
-	if(view->m_seqWriteUi.getEndLba() == NULL_32) {
-		eu32 strEndLba = getCapacity();
-        Utility su;
-		view->m_seqWriteUi.setDefaultValue(_T("0"), su.toHexString(strEndLba), _T("80"), _T("80"));
-	}
 	SequenceWrite sw(usbCmd);
 	sw.sequenceWrite(view->m_seqWriteUi);
 }
@@ -105,13 +119,9 @@ void CmderCtrller::squenceWrite() {
 void CmderCtrller::randomWrite() {
 	CmderView* view = &m_view;
     CmdIf usbCmd = get_cmdif();
-	RandomWrite rw(usbCmd);
+	seEndLba();
 	
-	if(view->m_rdmWriteUi.getEndLba() == NULL_32) {
-        eu32 strEndLba = getCapacity();
-        Utility su;
-		view->m_seqWriteUi.setDefaultValue(_T("0"), su.toHexString(strEndLba), _T("80"), _T("80"));
-	}
+	RandomWrite rw(usbCmd);
 	rw.randomWrite(m_view.m_rdmWriteUi);
 }
 

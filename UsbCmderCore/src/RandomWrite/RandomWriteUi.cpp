@@ -17,7 +17,7 @@ RandomWriteUi::RandomWriteUi()
 RandomWriteUi::~RandomWriteUi() {
 }
 
-void RandomWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* ramdomSeed, CEdit* stopAt, CButton* stop, CButton* isPending, CButton* isFake) {
+void RandomWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* ramdomSeed, CEdit* stopAt, CButton* stop, CButton* isPending, CButton* isFake, CButton* isNoRead) {
     m_randomSeed = ramdomSeed;
     m_pendingAt = stopAt;
     m_stop = stop;
@@ -28,6 +28,8 @@ void RandomWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* ramdomSeed, C
     m_isPending = isPending;
 
 	m_fake = isFake;
+
+	m_isNoRead = isNoRead;
 
     m_du.setText(m_randomSeed, _ET("0"));
     m_du.setText(m_pendingAt, _ET("0"));
@@ -43,7 +45,8 @@ void RandomWriteUi::set_ui_item(CDialog* dialog, RdmWriteUiNum_p numOjb) {
 
         , du.getDlgItemPtr<CButton>(dialog, numOjb->stop)
         , du.getDlgItemPtr<CButton>(dialog, numOjb->isPending)
-        , du.getDlgItemPtr<CButton>(dialog, numOjb->isFake)
+		, du.getDlgItemPtr<CButton>(dialog, numOjb->isFake)
+		, du.getDlgItemPtr<CButton>(dialog, numOjb->isNoRead)
     );
 }
 
@@ -69,6 +72,10 @@ bool RandomWriteUi::isStop() {
 
 bool RandomWriteUi::isPending() {
     return m_u.toBool(m_isPending->GetCheck());
+}
+
+bool RandomWriteUi::isNoRead() {
+	return m_u.toBool(m_isNoRead->GetCheck());
 }
 
 void RandomWriteUi::setPending() {

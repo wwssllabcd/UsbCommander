@@ -20,7 +20,7 @@ public:
 
 private:
     CmdIf m_usbCmd;
-
+	void makeButterflyPattern(eu32 number, int length, eu8_p buf);
 	void lbaWrite(eu32 lba, eu16 secLen, eu8* buffer);
 	void lbaRead(eu32 lba, eu16 secLen, eu8* buffer);
 	void vdrReboot();

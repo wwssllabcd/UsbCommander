@@ -30,6 +30,7 @@ private:
     eu32 getCapacity();
 	eu32 toLba(UsbCmdStruct cmd);
 	void lba_up_down_ctrl(UsbCmdStruct& curUsbCmd, bool isIncrease);
+	void seEndLba();
     CmdIf get_cmdif();
 
 	eu8 pc_buffer[_256K];
