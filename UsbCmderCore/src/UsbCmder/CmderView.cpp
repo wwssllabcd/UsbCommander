@@ -102,10 +102,10 @@ UsbCmdStruct CmderView::loadCmdSetFromUI(eu32 partialSetCtrl) {
 			objCmd.cdb[i] = (eu8)m_u.hexToU32(m_du.getText<CEdit>(m_cdbs[i]));
 		}
 	}
-	if (partialSetCtrl& BIT_12) {
+	if (partialSetCtrl& E_BIT_12) {
 		objCmd.length = getDataLenFromUi();
 	}
-	if (partialSetCtrl& BIT_13) {
+	if (partialSetCtrl& E_BIT_13) {
 		objCmd.direction = getDirectionFromUi();
 	}
 	return objCmd;
@@ -118,10 +118,10 @@ void CmderView::setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl) {
 			m_cdbs[i]->SetWindowText(su.toHexString(objCmd.cdb[i]).c_str());
 		}
 	}
-	if (partialSetCtrl& BIT_12) {
+	if (partialSetCtrl& E_BIT_12) {
 		setDataLenToUi(objCmd.length);
 	}
-	if (partialSetCtrl& BIT_13) {
+	if (partialSetCtrl& E_BIT_13) {
 		setDirectionToUi(objCmd.direction);
 	}
 }
