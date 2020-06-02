@@ -96,6 +96,7 @@ void CUsbCommanderDlg::init_var(){
     cmderNumObj.dataOut = IDC_RDO_DATA_OUT;
     cmderNumObj.dataLen = IDC_TXT_DATA_LENGTH;
     cmderNumObj.message = IDC_TXT_MAIN_MSG;
+	cmderNumObj.asciiMessage = IDC_TXT_ASC_MSG;
 
     m_ctrler.m_view.setDlgPointer(this);
     m_ctrler.m_view.setup_ui_num_to_view(&cmderNumObj);
@@ -103,17 +104,20 @@ void CUsbCommanderDlg::init_var(){
     SeqWriteUiNum seqNumObj;
     seqNumObj.startLba = IDC_txtSeqStartLba;
     seqNumObj.endLba = IDC_txtSeqEndLba;
+	seqNumObj.noRead = IDC_btnNoRead;
+	seqNumObj.stop = IDC_btnStop;
+
     seqNumObj.secCnt = IDC_txtSeqSecCnt;
     seqNumObj.lbaStep = IDC_txtSeqLbaStep;
-    seqNumObj.noRead = IDC_btnNoRead;
     seqNumObj.noWrite = IDC_btnNoWrite;
-    seqNumObj.stop = IDC_btnStop;
+
 
     m_ctrler.m_view.m_seqWriteUi.set_ui_item(this, &seqNumObj);
 
     RdmWriteUiNum rdmNumObj;
     rdmNumObj.startLba = IDC_txtSeqStartLba;
     rdmNumObj.endLba = IDC_txtSeqEndLba;
+	rdmNumObj.noRead = IDC_btnNoRead;
     rdmNumObj.stop = IDC_btnStop;
     rdmNumObj.ramdomSeed = IDC_txtRdmSeed;
     rdmNumObj.stopAt = IDC_txtStopAt;
@@ -228,11 +232,11 @@ BOOL CUsbCommanderDlg::PreTranslateMessage(MSG* pMsg) {
         case VK_PRIOR:
             m_ctrler.pageUp();
             UpdateWindow();
-            break;
+			return 1;
         case VK_NEXT:
             m_ctrler.pageDown();
             UpdateWindow();
-            break;
+			return 1;
         }
     }
     return CDialog::PreTranslateMessage(pMsg);
