@@ -203,10 +203,6 @@ void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring_cr msg) {
 	//init
 	if(isClean) {
 		pMsgArea->SetWindowText(msg.c_str());
-		
-		
-
-	
 	} else {
 		int end = pMsgArea->GetWindowTextLength();
 		pMsgArea->SetSel(end, end);

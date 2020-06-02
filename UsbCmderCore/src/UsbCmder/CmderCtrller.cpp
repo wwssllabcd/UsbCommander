@@ -135,3 +135,8 @@ void CmderCtrller::init() {
     m_view.init();
     refresh();
 }
+
+void CmderCtrller::close() {
+	m_view.m_seqWriteUi.stop();
+	m_view.m_rdmWriteUi.stop();
+}

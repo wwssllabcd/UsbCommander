@@ -99,7 +99,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 	eu8* pWriteBuf = m_writeBuf;
 	eu8* pReadBuf = m_readBuf;
 
-	eu32 dataLen = secCnt * BYTE_PER_LBA_UNIT;
+	eu32 dataLen = secCnt * BYTE_PER_SECTOR;
 	if (dataLen > sizeof(m_readBuf)) {
 		THROW_MYEXCEPTION(0, _ET("SeqW: buffer OFB"));
 	}

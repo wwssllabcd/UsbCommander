@@ -154,7 +154,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 	bool isNoRead = ui.isNoRead();
 	
 
-	eu32 maxBufLen = secRange * BYTE_PER_LBA_UNIT;
+	eu32 maxBufLen = secRange * BYTE_PER_SECTOR;
 	if (maxBufLen > sizeof(pReadBuf)) {
 		THROW_MYEXCEPTION(0, _ET("RdmW: buffer OFB"));
 	}
@@ -208,7 +208,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 			SEND_MSG(_ET("(%x)W/R LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
 		}
 
-        int length = secCnt * BYTE_PER_LBA_UNIT;
+        int length = secCnt * BYTE_PER_SECTOR;
 
         // make buffer
         m_u.makeBuf(writeLba, length, pWriteBuf);
@@ -258,13 +258,14 @@ void RandomWrite::verifyRecordLba() {
     SEND_MSG(_ET("Verify Record Lba count = %X"), cnt);
 
     for (eu32 i = 0; i < cnt; i++) {
+		DialogUtility::updateOS();
         eu32 lba = m_lbaColl[i].lba;
         eu16 secCnt = m_lbaColl[i].secCnt;
         // Read lba 512 byte
 
         lbaRead(lba, secCnt, readBuf);
 
-		eu32 dataLen = secCnt * BYTE_PER_LBA_UNIT;
+		eu32 dataLen = secCnt * BYTE_PER_SECTOR;
 
         // make buffer
         m_u.makeBuf(lba, dataLen, compBuf);

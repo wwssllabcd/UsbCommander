@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "CmdIf.h"
 
-#define _ENABLE_DEVICE_CTRL_
+//#define _ENABLE_DEVICE_CTRL_
 
 #ifdef _ENABLE_DEVICE_CTRL_
 
@@ -39,7 +39,7 @@ void CmdIf::release_device(void) {
 }
 
 #else
-void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring desc) const {
+void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const {
     //Lba read
     eu8 opCode = cdb[0];
     if (opCode == 0x28) {

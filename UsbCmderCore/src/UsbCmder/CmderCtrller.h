@@ -22,6 +22,7 @@ public:
 	void randomWrite();
 	void pageUp();
 	void pageDown();
+	void close();
 
     CmderView m_view;
 
