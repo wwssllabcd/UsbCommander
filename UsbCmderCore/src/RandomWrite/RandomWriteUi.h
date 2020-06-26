@@ -13,7 +13,7 @@ typedef struct {
     int stop;
     int isPending;
 	int isFake;
-	int noRead;
+	int isNoRead;
 }RdmWriteUiNum;
 ERIC_GEN_OTHER_TYPE(RdmWriteUiNum);
 

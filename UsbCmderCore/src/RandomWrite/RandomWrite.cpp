@@ -36,8 +36,6 @@ estring RandomWrite::makeHeader(eu32 startLba, eu32 endLba, eu32 seed) {
 eu32 RandomWrite::getWriteLba(eu32 startLba, eu32 endLba, eu32 secCnt, eu32 count) {
     eu32 writeLba;
     while (1) {
-
-        
         //writeLba = static_cast<eu32>(GetRandom(startLba, endLba));
         writeLba = m_u.getRandom(startLba, endLba);
 
@@ -275,7 +273,7 @@ void RandomWrite::verifyRecordLba() {
         if (result != 0) {
             estring msg = _ET("\r\n--- Verify Record fail step=") + su.toHexString(i);
             msg += _ET("\r\n LBA =") + su.toHexString(lba) + _ET(", len =") + su.toHexString(secCnt);
-            msg += getDiffStringInTwoBuf(lba, dataLen, compBuf, readBuf);
+            msg += getDiffStringInTwoBuf(lba, secCnt, compBuf, readBuf);
             SEND_MSG_STR(msg);
             THROW_MYEXCEPTION(0, _ET("verifyRecordLba error"));
         }
@@ -286,13 +284,13 @@ void RandomWrite::verifyRecordLba() {
     }
 }
 
-estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, int length, eu8* writeBuf, eu8* readBuf) {
+estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf) {
     estring result, msg;
     Utility su;
     int errorCnt = 0;
-    result = Utility::crLf() + su.strFormat(_ET("  cmp error in 0x%x"), lbaAddr);
+	result = Utility::crLf() + su.strFormat(_ET(" cmp error in lbaAddr = %x"), lbaAddr);
 
-    for (int g = 0; g < length; g++) {
+	for (int g = 0; g < secCnt*BYTE_PER_SECTOR; g++) {
         if (writeBuf[g] != readBuf[g]) {
             if (errorCnt < 20) {
                 msg = su.strFormat(_ET("  writeBuf[%x]=0x%x,readBuf[%x]=0x%x"), g, writeBuf[g], g, readBuf[g]);

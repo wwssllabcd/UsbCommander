@@ -38,7 +38,7 @@ private:
 	void vdrReboot();
 	void compareData(eu8* writeBuf, eu8* readBuf, int length, eu32 writeLba);
 
-	estring getDiffStringInTwoBuf(eu32 lbaAddr, int length, eu8* writeBuf, eu8* readBuf);
+	estring getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf);
 
     Utility m_u;
 

@@ -158,13 +158,13 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 }
 
-estring SequenceWrite::getDiffStringInTwoBuf(eu32 lbaAddr, int length, eu8* writeBuf, eu8* readBuf) {
+estring SequenceWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf) {
 	estring result, msg;
 	Utility su;
 	int errorCnt = 0;
-	result = Utility::crLf() + su.strFormat(_ET("  cmp error in 0x%x"), lbaAddr);
+	result = Utility::crLf() + su.strFormat(_ET(" cmp error in lbaAddr = %x"), lbaAddr);
 
-	for (int g = 0; g < length; g++) {
+	for (int g = 0; g < secCnt*BYTE_PER_SECTOR; g++) {
 		if (writeBuf[g] != readBuf[g]) {
 			if (errorCnt < 20) {
 				msg = su.strFormat(_ET("  writeBuf[%x]=0x%x,readBuf[%x]=0x%x"), g, writeBuf[g], g, readBuf[g]);

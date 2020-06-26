@@ -12,6 +12,11 @@ class UsbCmdStruct;
 typedef vector<UsbCmdStruct> UsbCmdSet;
 
 #define BYTE_PER_SECTOR           (4096)
+#define SECTOR_TO_BYTE(SEC)             ((SEC) * BYTE_PER_SECTOR)
+
+#define UFI_OP_READ_10 (0x28)
+#define UFI_OP_WRITE_10 (0x2A)
+#define UFI_OP_READ_CAPACITY (0x25)
 
 class UsbCmdStruct
 {
@@ -23,8 +28,6 @@ public:
 	int length;
 	eu8 direction;
 	estring description;
-
-	
 
 	bool operator ==(const UsbCmdStruct& rhs) const;
 

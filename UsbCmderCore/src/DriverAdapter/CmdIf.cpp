@@ -42,21 +42,24 @@ void CmdIf::release_device(void) {
 void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const {
     //Lba read
     eu8 opCode = cdb[0];
-    if (opCode == 0x28) {
+	
+    if (opCode == UFI_OP_READ_10) {
         memcpy(buffer, m_fakeDevice, byteCnt);
         return;
     }
-    if (opCode == 0x2A) {
+    if (opCode == UFI_OP_WRITE_10) {
         memcpy((void*)m_fakeDevice, buffer, byteCnt);
         return;
     }
 
     //UFI: capacity
-    if (opCode == 0x25) {
-        buffer[2] = 0xF0;
-        buffer[3] = 0x00;
-        buffer[4] = 0x00;
-        buffer[5] = 0x00;
+    if (opCode == UFI_OP_READ_CAPACITY) {
+	    eu32 cap = 0xF0000000;
+		//MSB format
+		buffer[0] = ((cap >> 0x18) & 0xFF);
+		buffer[1] = ((cap >> 0x10) & 0xFF);
+		buffer[2] = ((cap >> 0x08) & 0xFF);
+		buffer[3] = ((cap >> 0x00) & 0xFF);
         return;
     }
 }

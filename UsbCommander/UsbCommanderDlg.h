@@ -38,4 +38,6 @@ public:
     afx_msg void OnBnClickedBtnExecute();
     afx_msg void OnBnClickedbtnseqstart();
     afx_msg void OnBnClickedbtnrdmstart();
+	afx_msg void OnClose();
+	afx_msg void OnCbnSelchangeCboDriveSel();
 };

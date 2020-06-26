@@ -46,7 +46,7 @@ void RandomWriteUi::set_ui_item(CDialog* dialog, RdmWriteUiNum_p numOjb) {
         , du.getDlgItemPtr<CButton>(dialog, numOjb->stop)
         , du.getDlgItemPtr<CButton>(dialog, numOjb->isPending)
 		, du.getDlgItemPtr<CButton>(dialog, numOjb->isFake)
-		, du.getDlgItemPtr<CButton>(dialog, numOjb->noRead)
+		, du.getDlgItemPtr<CButton>(dialog, numOjb->isNoRead)
     );
 }
 

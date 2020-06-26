@@ -61,7 +61,7 @@ eu32 CmderCtrller::toLba(UsbCmdStruct cmd) {
 
 void CmderCtrller::executeUsbCmd(UsbCmdStruct cmd) {
 	memset(pc_buffer, 0xcc, sizeof(pc_buffer)); // init buffer
-	if(cmd.cdb[0] == 0x2A) {
+	if(cmd.cdb[0] == UFI_OP_WRITE_10) {
 		m_u.makeBuf(toLba(cmd), cmd.length, pc_buffer);
 	}
 

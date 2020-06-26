@@ -108,7 +108,7 @@ UsbCmdStruct UsbCmdStruct::preventAllowMediumRemoval(void) {
 
 UsbCmdStruct UsbCmdStruct::read10(void) {
 	UsbCmdStruct usbCmdSet;
-	usbCmdSet.cdb[0] = 0x28;
+	usbCmdSet.cdb[0] = UFI_OP_READ_10;
 	usbCmdSet.cdb[8] = 1;
 	usbCmdSet.length = BYTE_PER_SECTOR;
 	usbCmdSet.direction = FLAG_DATA_IN;
@@ -131,7 +131,7 @@ UsbCmdStruct UsbCmdStruct::read10(eu32 lba, eu16 secCnt) {
 
 UsbCmdStruct UsbCmdStruct::write10(void) {
 	UsbCmdStruct usbCmdSet;
-	usbCmdSet.cdb[0] = 0x2a;
+	usbCmdSet.cdb[0] = UFI_OP_WRITE_10;
 	usbCmdSet.cdb[8] = 1;
 	usbCmdSet.length = BYTE_PER_SECTOR;
 	usbCmdSet.direction = FLAG_DATA_OUT;
