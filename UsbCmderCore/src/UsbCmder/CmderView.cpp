@@ -128,7 +128,7 @@ void CmderView::setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl) {
 
 void CmderView::driveSelectChange() {
 	estring res = estring(_ET("SysInfo: Select Device - ")) + m_du.getText(m_cboDriveSel);
-	//m_du.setText(m_lblSysMsg, res);
+	m_du.setText(m_lblSysMsg, res);
 }
 
 void CmderView::selectChange() {

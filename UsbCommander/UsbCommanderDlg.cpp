@@ -96,6 +96,7 @@ void CUsbCommanderDlg::init_var() {
     cmderNumObj.dataLen = IDC_TXT_DATA_LENGTH;
     cmderNumObj.message = IDC_TXT_MAIN_MSG;
     cmderNumObj.asciiMessage = IDC_TXT_ASC_MSG;
+    cmderNumObj.sysInfo = IDC_LBL_SYSTEM_MSG;
 
     m_ctrler.m_view.setDlgPointer(this);
     m_ctrler.m_view.setup_ui_num_to_view(&cmderNumObj);
@@ -246,4 +247,5 @@ void CUsbCommanderDlg::OnClose() {
 }
 
 void CUsbCommanderDlg::OnCbnSelchangeCboDriveSel() {
+    m_ctrler.driverChange();
 }
