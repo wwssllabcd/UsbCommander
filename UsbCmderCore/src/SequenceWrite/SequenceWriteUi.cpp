@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "SequenceWriteUi.h"
+#include "DriverAdapter\UsbCmdStruct.h"
 
 SequenceWriteUi::SequenceWriteUi()
     :m_startLba(0)
@@ -32,7 +33,10 @@ void SequenceWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* secCnt, CEd
     m_noWrite = noWrite;
     m_stop = stop;
 
-    setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("20"), _ET("20"));
+	setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("80"), _ET("80"));
+	if (BYTE_PER_SECTOR == 4096) {
+		setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("20"), _ET("20"));
+	}
 }
 
 void SequenceWriteUi::set_ui_item(CDialog* dialog, SeqWriteUiNum_p numOjb) {

@@ -127,8 +127,8 @@ void CmderView::setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl) {
 }
 
 void CmderView::driveSelectChange() {
-	estring res = m_du.getText(m_cboDriveSel);
-	m_du.setText(m_lblSysMsg, res);
+	estring res = estring(_ET("SysInfo: Select Device - ")) + m_du.getText(m_cboDriveSel);
+	//m_du.setText(m_lblSysMsg, res);
 }
 
 void CmderView::selectChange() {
@@ -173,6 +173,7 @@ void CmderView::set_device_box(vector<estring> deviceName) {
         m_cboDriveSel->AddString(deviceName[i].c_str());
     }
     m_cboDriveSel->SetCurSel(0);
+	driveSelectChange();
 }
 
 int CmderView::getShiftNo(bool isIncrease) {

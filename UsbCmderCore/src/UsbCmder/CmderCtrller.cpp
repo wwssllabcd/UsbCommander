@@ -140,3 +140,7 @@ void CmderCtrller::close() {
 	m_view.m_seqWriteUi.stop();
 	m_view.m_rdmWriteUi.stop();
 }
+
+void CmderCtrller::driverChange() {
+	m_view.driveSelectChange();
+}

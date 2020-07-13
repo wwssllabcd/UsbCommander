@@ -84,7 +84,6 @@ void RandomWriteUi::setPending() {
 
 void RandomWriteUi::stop() {
 	this->m_stop->SetCheck(1);
-	this->m_isPending->SetCheck(1);
 }
 
 bool RandomWriteUi::isFake() {

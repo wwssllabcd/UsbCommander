@@ -23,6 +23,7 @@ public:
 	void pageUp();
 	void pageDown();
 	void close();
+	void driverChange();
 
     CmderView m_view;
 

@@ -8,6 +8,10 @@
 #include "Utility/EricException.h"
 #include "DriverAdapter/UsbCmdStruct.h"
 
+
+#define DATA_BUFFER_SIZE (_256K)
+
+
 SequenceWrite::SequenceWrite(const CmdIf& usbCmd) {
 	this->m_usbCmd = usbCmd;
 }
@@ -39,7 +43,7 @@ bool SequenceWrite::sequenceWrite(SequenceWriteUi& ui) {
 	);
 }
 
-estring SequenceWrite::genMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8* pWriteBuf, eu8* pReadBuf){
+estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8* pWriteBuf, eu8* pReadBuf){
 	estring msg;
     Utility su;
 	msg = Utility::crLf();
@@ -48,49 +52,12 @@ estring SequenceWrite::genMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curL
 	msg += _ET("Stop at step No.") + su.toString(howManyStep) + Utility::crLf() + Utility::crLf();
 	msg += getDiffStringInTwoBuf(curLba, secCnt, pWriteBuf, pReadBuf);
 
-	estring strReadBuf = su.makeHexTable(secCnt * 512, pReadBuf);
+	estring strReadBuf = su.makeHexTable(secCnt * BYTE_PER_SECTOR, pReadBuf);
 	msg += Utility::crLf() + Utility::crLf() + _ET("======= Read Buf ========= ") + Utility::crLf() + strReadBuf;
 
 	return msg;
 }
 
-void SequenceWrite::makeButterflyPattern(eu32 number, int length, eu8_p buf) {
-	//align 512
-	if ((length % 512) != 0) {
-		THROW_MYEXCEPTION(0, _ET("SeqW: need align 512 byte"));
-	}
-	Utility u;
-	eu8 wsl[512];
-	for (int i = 0; i < 512; i += 0x40) {
-		u.toArray((eu32)0x55555555, wsl + i + 0);
-		u.toArray((eu32)0xAAAAAAAA, wsl + i + 4);
-		u.toArray((eu32)0x5A5A5A5A, wsl + i + 8);
-		u.toArray((eu32)0xA5A5A5A5, wsl + i + 12);
-
-		u.toArray((eu32)0xAAAAAAAA, wsl + i + 0x10);
-		u.toArray((eu32)0x5A5A5A5A, wsl + i + 0x14);
-		u.toArray((eu32)0xA5A5A5A5, wsl + i + 0x18);
-		u.toArray((eu32)0x55555555, wsl + i + 0x1C);
-
-		u.toArray((eu32)0x5A5A5A5A, wsl + i + 0x20);
-		u.toArray((eu32)0xA5A5A5A5, wsl + i + 0x24);
-		u.toArray((eu32)0x55555555, wsl + i + 0x28);
-		u.toArray((eu32)0xAAAAAAAA, wsl + i + 0x2C);
-
-		u.toArray((eu32)0xA5A5A5A5, wsl + i + 0x30);
-		u.toArray((eu32)0x55555555, wsl + i + 0x34);
-		u.toArray((eu32)0xAAAAAAAA, wsl + i + 0x38);
-		u.toArray((eu32)0x5A5A5A5A, wsl + i + 0x3C);
-	}
-
-	int cnt = length / 512;
-	for (int b = 0; b < cnt; b++) {
-		memcpy(buf + b * 512, wsl, 512);
-	}
-}
-
-
-#define DATA_BUFFER_SIZE (_256K)
 bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 secCnt, bool isNoWrite, bool isNoRead, SequenceWriteUi& ui)
 {
 	eu8 m_readBuf[DATA_BUFFER_SIZE];
@@ -144,7 +111,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 		//印出哪裡有問題
 		if(result != 0) {
-			msg = genMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, pWriteBuf, pReadBuf);
+			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, pWriteBuf, pReadBuf);
             SEND_MSG_STR(msg);
 			return false;
 		}

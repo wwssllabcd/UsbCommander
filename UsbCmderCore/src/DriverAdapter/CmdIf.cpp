@@ -14,7 +14,7 @@
 
 using namespace EricCore;
 
-void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const {
+void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) {
     DriveService* ds = DriveService::getInstance();
 
     if (m_curSel == -1) {
@@ -39,27 +39,47 @@ void CmdIf::release_device(void) {
 }
 
 #else
-void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) const {
+
+#include "Utility\Utility.h"
+
+void CmdIf::lba_read(eu32 lba, eu32 secCnt, eu8_p buffer) {
+	memcpy(buffer, m_fakeDevice, secCnt * BYTE_PER_SECTOR);
+}
+
+void CmdIf::lba_write(eu32 lba, eu32 secCnt, eu8_p buffer){
+	memcpy((void*)m_fakeDevice, buffer, secCnt * BYTE_PER_SECTOR);
+}
+
+void CmdIf::get_ufi_capacity(eu8_p buffer) {
+	eu32 cap = 0xF0000000;
+
+	//MSB format
+	buffer[0] = ((cap >> 0x18) & 0xFF);
+	buffer[1] = ((cap >> 0x10) & 0xFF);
+	buffer[2] = ((cap >> 0x08) & 0xFF);
+	buffer[3] = ((cap >> 0x00) & 0xFF);
+}
+
+void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) {
     //Lba read
     eu8 opCode = cdb[0];
-	
+	Utility u;
     if (opCode == UFI_OP_READ_10) {
-        memcpy(buffer, m_fakeDevice, byteCnt);
+		eu32 lba = u.toU32(cdb + 2);
+		eu32 secCnt = u.toU16(cdb + 7);
+		lba_read(lba, secCnt, buffer);
         return;
     }
     if (opCode == UFI_OP_WRITE_10) {
-        memcpy((void*)m_fakeDevice, buffer, byteCnt);
+		eu32 lba = u.toU32(cdb + 2);
+		eu32 secCnt = u.toU16(cdb + 7);
+		lba_write(lba, secCnt, buffer);
         return;
     }
 
     //UFI: capacity
     if (opCode == UFI_OP_READ_CAPACITY) {
-	    eu32 cap = 0xF0000000;
-		//MSB format
-		buffer[0] = ((cap >> 0x18) & 0xFF);
-		buffer[1] = ((cap >> 0x10) & 0xFF);
-		buffer[2] = ((cap >> 0x08) & 0xFF);
-		buffer[3] = ((cap >> 0x00) & 0xFF);
+		get_ufi_capacity(buffer);
         return;
     }
 }
@@ -84,37 +104,37 @@ CmdIf::~CmdIf(void)
 {
 }
 
-void CmdIf::send_cmd(UsbCmdStruct cmd, eu8* buffer) const {
+void CmdIf::send_cmd(UsbCmdStruct cmd, eu8* buffer) {
     send_cmd(cmd.cdb, buffer, cmd.length, cmd.direction, cmd.description);
 }
 
-void CmdIf::write10(eu32 lba, eu16 secCnt, eu8* buffer) const {
+void CmdIf::write10(eu32 lba, eu16 secCnt, eu8* buffer) {
     UsbCmdStruct cmd;
     send_cmd(cmd.write10(lba, secCnt), buffer);
 }
 
-void CmdIf::read10(eu32 lba, eu16 secCnt, eu8* buffer) const {
+void CmdIf::read10(eu32 lba, eu16 secCnt, eu8* buffer) {
     UsbCmdStruct cmd;
     send_cmd(cmd.read10(lba, secCnt), buffer);
 }
 
-void CmdIf::testUnitReady() const {
+void CmdIf::testUnitReady() {
     eu8 buffer[1];
     UsbCmdStruct cmd;
     send_cmd(cmd.testUnitReady(), buffer);
 }
 
-void CmdIf::inquiry(eu8* buffer) const {
+void CmdIf::inquiry(eu8* buffer) {
     UsbCmdStruct cmd;
     send_cmd(cmd.inquiry(), buffer);
 }
 
-void CmdIf::readCapacity(eu8* buffer) const {
+void CmdIf::readCapacity(eu8* buffer) {
     UsbCmdStruct cmd;
     send_cmd(cmd.readCapacity(), buffer);
 }
 
-void CmdIf::vdrReboot(void) const {
+void CmdIf::vdrReboot(void) {
     UsbCmdStruct cmd;
     eu8 buffer[1];
     send_cmd(cmd.vdrReboot(), buffer);
