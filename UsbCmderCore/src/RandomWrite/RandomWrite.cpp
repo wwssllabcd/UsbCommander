@@ -206,27 +206,24 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 			SEND_MSG(_ET("(%x)W/R LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
 		}
 
-        int length = secCnt * BYTE_PER_SECTOR;
+        eu32 byteCnt = secCnt * BYTE_PER_SECTOR;
 
         // make buffer
-        m_u.makeBuf(writeLba, length, pWriteBuf);
+        m_u.makeBuf(writeLba, byteCnt, pWriteBuf);
 
         recordLbaAddr(writeLba, secCnt);
 
         if (ui.isFake() == false) {
             lbaWrite(writeLba, secCnt, pWriteBuf);
 
-			if (isNoRead) {
-				lbaRead(writeLba, secCnt, pReadBuf);
+			if (isNoRead == false) {
                 vdrReboot();
                 lbaRead(writeLba, secCnt, pReadBuf);
-                compareData(pWriteBuf, pReadBuf, length, writeLba);
+                compareData(pWriteBuf, pReadBuf, byteCnt, writeLba);
             }
 
             if ((count % 0x40) == 0) {
-                lbaRead(writeLba, secCnt, pReadBuf);
-                vdrReboot();
-                verifyRecordLba();
+                //verifyRecordLba();
             }
         }
         pendingProcess(ui, count);
@@ -236,13 +233,13 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
     return;
 }
 
-void RandomWrite::compareData(eu8* writeBuf, eu8* readBuf, int length, eu32 writeLba) {
-    int result = memcmp(readBuf, writeBuf, length);
+void RandomWrite::compareData(eu8* writeBuf, eu8* readBuf, eu32 byteCnt, eu32 writeLba) {
+    int result = memcmp(readBuf, writeBuf, byteCnt);
     //印出哪裡有問題
     if (result != 0) {
         estring msg = _ET("..fail");
         SEND_MSG_STR(msg);
-        msg = getDiffStringInTwoBuf(writeLba, length, writeBuf, readBuf);
+        msg = getDiffStringInTwoBuf(writeLba, byteCnt, writeBuf, readBuf);
         SEND_MSG_STR(msg);
         THROW_MYEXCEPTION(0, _ET("RandomWrite Fail"));
     } 
@@ -284,26 +281,26 @@ void RandomWrite::verifyRecordLba() {
     }
 }
 
-estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf) {
-    estring result, msg;
-    Utility su;
-    int errorCnt = 0;
+estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu32 byteCnt, eu8* writeBuf, eu8* readBuf) {
+	estring result, msg;
+	Utility su;
+	int errorCnt = 0;
 	result = Utility::crLf() + su.strFormat(_ET(" cmp error in lbaAddr = %x"), lbaAddr);
 
-	for (int g = 0; g < secCnt*BYTE_PER_SECTOR; g++) {
-        if (writeBuf[g] != readBuf[g]) {
-            if (errorCnt < 20) {
-                msg = su.strFormat(_ET("  writeBuf[%x]=0x%x,readBuf[%x]=0x%x"), g, writeBuf[g], g, readBuf[g]);
-                result += Utility::crLf() + msg;
-            }
-            errorCnt++;
-        }
-    }
+	for (eu32 g = 0; g < byteCnt; g++) {
+		if (writeBuf[g] != readBuf[g]) {
+			if (errorCnt < 20) {
+				msg = su.strFormat(_ET("  writeBuf[%x]=0x%x,readBuf[%x]=0x%x"), g, writeBuf[g], g, readBuf[g]);
+				result += Utility::crLf() + msg;
+			}
+			errorCnt++;
+		}
+	}
 
-    if (errorCnt >= 20) {
-        result += Utility::crLf() + _ET("over 20 error");
-    }
+	if (errorCnt >= 20) {
+		result += Utility::crLf() + _ET("over 20 error");
+	}
 
-    result += Utility::crLf() + su.strFormat(_ET("Fail ECC Cnt = 0x%X"), errorCnt);
-    return result;
+	result += Utility::crLf() + su.strFormat(_ET("Fail ECC Cnt = 0x%X"), errorCnt);
+	return result;
 }

@@ -5,6 +5,8 @@
 #include "DefineFiles\DefBitConst.h"
 #include "Utility/Utility.h"
 
+#define MAX_TEXTBOX_SIZE (0x6000)
+
 CmderView::CmderView()
 	:m_pDataLen(0)
 	, m_pDataIn(0)
@@ -102,7 +104,7 @@ UsbCmdStruct CmderView::loadCmdSetFromUI(eu32 partialSetCtrl) {
 			objCmd.cdb[i] = (eu8)m_u.hexToU32(m_du.getText<CEdit>(m_cdbs[i]));
 		}
 	}
-	if (partialSetCtrl& E_BIT_12) {
+	if (partialSetCtrl & E_BIT_12) {
 		objCmd.length = getDataLenFromUi();
 	}
 	if (partialSetCtrl& E_BIT_13) {
@@ -206,6 +208,13 @@ void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring_cr msg) {
 		pMsgArea->SetWindowText(msg.c_str());
 	} else {
 		int end = pMsgArea->GetWindowTextLength();
+
+		if (end >= MAX_TEXTBOX_SIZE) {
+			//force clean text
+			pMsgArea->SetWindowText(msg.c_str());
+			return;
+		}
+
 		pMsgArea->SetSel(end, end);
 		pMsgArea->ReplaceSel(msg.c_str());
 	}

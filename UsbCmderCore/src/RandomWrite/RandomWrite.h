@@ -36,9 +36,9 @@ private:
 	void lbaRead(eu32 lba, eu16 secLen, eu8* buffer);
 	void clearTextArea(estring titleMsg, eu32 count);
 	void vdrReboot();
-	void compareData(eu8* writeBuf, eu8* readBuf, int length, eu32 writeLba);
+	void compareData(eu8* writeBuf, eu8* readBuf, eu32 byteCnt, eu32 writeLba);
 
-	estring getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf);
+	estring getDiffStringInTwoBuf(eu32 lbaAddr, eu32 byteCnt, eu8* writeBuf, eu8* readBuf);
 
     Utility m_u;
 
