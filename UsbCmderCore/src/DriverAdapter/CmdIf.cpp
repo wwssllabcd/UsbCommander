@@ -39,26 +39,8 @@ void CmdIf::release_device(void) {
 }
 
 #else
-
+#include "SimpleFtl.h"
 #include "Utility\Utility.h"
-
-void CmdIf::lba_read(eu32 lba, eu32 secCnt, eu8_p buffer) {
-	memcpy(buffer, m_fakeDevice, secCnt * BYTE_PER_SECTOR);
-}
-
-void CmdIf::lba_write(eu32 lba, eu32 secCnt, eu8_p buffer){
-	memcpy((void*)m_fakeDevice, buffer, secCnt * BYTE_PER_SECTOR);
-}
-
-void CmdIf::get_ufi_capacity(eu8_p buffer) {
-	eu32 cap = 0xF0000000;
-
-	//MSB format
-	buffer[0] = ((cap >> 0x18) & 0xFF);
-	buffer[1] = ((cap >> 0x10) & 0xFF);
-	buffer[2] = ((cap >> 0x08) & 0xFF);
-	buffer[3] = ((cap >> 0x00) & 0xFF);
-}
 
 void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc) {
     //Lba read

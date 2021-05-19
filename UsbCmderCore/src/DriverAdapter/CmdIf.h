@@ -28,13 +28,9 @@ public:
 private:
 	void send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring_cr desc);
 
-    eu8 m_fakeDevice[_128K];
+ 
 
-	void lba_read(eu32 lba, eu32 secCnt, eu8_p buffer);
 
-	void lba_write(eu32 lba, eu32 secCnt, eu8_p buffer);
-
-	void get_ufi_capacity(eu8_p buffer);
 
 };
 
