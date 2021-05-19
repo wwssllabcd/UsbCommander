@@ -15,7 +15,7 @@ typedef struct {
     int noWrite;
     int stop;
 }SeqWriteUiNum;
-ERIC_GEN_OTHER_TYPE(SeqWriteUiNum);
+ERIC_GEN_POINTER_TYPE(SeqWriteUiNum);
 
 class SequenceWriteUi
 {
