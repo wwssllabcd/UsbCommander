@@ -1,17 +1,18 @@
 #pragma once
 
 #include "DefineFiles/DefineFile.h"
-
-
 #include <vector>
-
 using namespace std;
 
 class UsbCmdStruct;
-
 typedef vector<UsbCmdStruct> UsbCmdSet;
 
+#ifdef  SECTOR_4K
+#define BYTE_PER_SECTOR                 (4096)
+#else
 #define BYTE_PER_SECTOR                 (512)
+#endif
+#define MAX_SEC_LEN                     (_128K/BYTE_PER_SECTOR)
 #define SECTOR_TO_BYTE(SEC)             ((SEC) * BYTE_PER_SECTOR)
 
 #define UFI_OP_READ_10                  (0x28)

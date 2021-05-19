@@ -28,7 +28,7 @@ void SequenceWrite::lbaRead(eu32 lba, eu16 cnt, eu8* buf) {
 }
 
 void SequenceWrite::vdrReboot() {
-	//m_usbCmd.vdrReboot();
+	m_usbCmd.vdrReboot();
 }
 
 bool SequenceWrite::sequenceWrite(SequenceWriteUi& ui) {

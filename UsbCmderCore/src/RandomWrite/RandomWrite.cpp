@@ -6,6 +6,7 @@
 #include "Utility/Observer.h"
 #include "Utility/EricException.h"
 
+#define DATA_BUFFER_SIZE    (_256K)
 RandomWrite::RandomWrite(CmdIf& usbcmd) {
     this->m_usbCmd = usbcmd;
 }
@@ -22,7 +23,7 @@ void RandomWrite::lbaRead(eu32 lba, eu16 cnt, eu8* buf) {
 }
 
 void RandomWrite::vdrReboot() {
-    //m_usbCmd.vdrReboot();
+    m_usbCmd.vdrReboot();
 }
 
 estring RandomWrite::makeHeader(eu32 startLba, eu32 endLba, eu32 seed) {
@@ -130,6 +131,7 @@ void RandomWrite::pendingProcess(RandomWriteUi& ui, eu32 count) {
     }
 
     if (ui.isPending() == true) {
+        SEND_MSG(_ET("Pending before starting step = %d"), count);
         while (1) {
             DialogUtility::updateOS();
             if (ui.isPending() == false) {
@@ -139,8 +141,6 @@ void RandomWrite::pendingProcess(RandomWriteUi& ui, eu32 count) {
     }
 }
 
-#define DATA_BUFFER_SIZE (_256K)
-#define MAX_SEC_LEN      (0x20)
 void RandomWrite::randomWrite(RandomWriteUi& ui) {
     eu8 pReadBuf[DATA_BUFFER_SIZE];
     eu8 pWriteBuf[DATA_BUFFER_SIZE];
@@ -183,6 +183,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
     while (1) {
         DialogUtility::updateOS();
 
+        pendingProcess(ui, count);
         // stop control
         if (ui.isStop()) {
             break;
@@ -223,10 +224,11 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
             }
 
             if ((count % 0x40) == 0) {
+                //vdrReboot();
                 //verifyRecordLba();
             }
         }
-        pendingProcess(ui, count);
+        
         count++;
     }
     SEND_MSG(_ET("\r\nFinish"));

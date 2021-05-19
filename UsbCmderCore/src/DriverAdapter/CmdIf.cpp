@@ -79,7 +79,7 @@ void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring
 
     //UFI: capacity
     if (opCode == UFI_OP_READ_CAPACITY) {
-		get_ufi_capacity(buffer);
+        get_ufi_capacity(buffer);
         return;
     }
 }
