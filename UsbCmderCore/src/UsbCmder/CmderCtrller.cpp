@@ -70,7 +70,7 @@ void CmderCtrller::executeUsbCmd(UsbCmdStruct cmd) {
 
     Utility su;
 	estring msg = su.makeHexTable(cmd.length, pc_buffer);
-	SEND_MSG_STR_CLEAR(msg);
+	SEND_MSG_CTRL(false, true, msg.c_str());
 
 	estring asciiMsg = su.makeAsciiTable(pc_buffer, cmd.length);
 	m_view.sendMsgToAsciiArea(true, asciiMsg);

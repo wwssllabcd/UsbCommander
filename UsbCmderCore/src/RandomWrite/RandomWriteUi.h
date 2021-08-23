@@ -15,7 +15,7 @@ typedef struct {
 	int isFake;
 	int isNoRead;
 }RdmWriteUiNum;
-ERIC_GEN_POINTER_TYPE(RdmWriteUiNum);
+ERIC_GEN_OTHER_TYPE(RdmWriteUiNum);
 
 class RandomWriteUi
 {

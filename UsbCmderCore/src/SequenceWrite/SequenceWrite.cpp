@@ -79,7 +79,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 	}
 
 	for(eu32 lbaAddr = startLba; lbaAddr <= endLba; lbaAddr += step) {
-		DialogUtility::updateOS();
+		DialogUtility::update_message();
 		if(ui.isStop()) {
 			break;
 		}

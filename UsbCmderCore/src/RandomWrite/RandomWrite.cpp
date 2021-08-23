@@ -84,7 +84,7 @@ void RandomWrite::clearTextArea(estring titleMsg, eu32 count) {
         SEND_MSG_CLEAR();
         SEND_MSG_STR(titleMsg);
     }
-    DialogUtility::updateOS();
+    DialogUtility::update_message();
 }
 
 void RandomWrite::recordLbaAddr(eu32 lba, eu8 secCnt) {
@@ -133,7 +133,7 @@ void RandomWrite::pendingProcess(RandomWriteUi& ui, eu32 count) {
     if (ui.isPending() == true) {
         SEND_MSG(_ET("Pending before starting step = %d"), count);
         while (1) {
-            DialogUtility::updateOS();
+            DialogUtility::update_message();
             if (ui.isPending() == false) {
                 break;
             }
@@ -181,7 +181,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
     fu.toFile(_ET("RandomWrite.txt"), titleMsg, false);
 
     while (1) {
-        DialogUtility::updateOS();
+        DialogUtility::update_message();
 
         pendingProcess(ui, count);
         // stop control
@@ -255,7 +255,7 @@ void RandomWrite::verifyRecordLba() {
     SEND_MSG(_ET("Verify Record Lba count = %X"), cnt);
 
     for (eu32 i = 0; i < cnt; i++) {
-		DialogUtility::updateOS();
+		DialogUtility::update_message();
         eu32 lba = m_lbaColl[i].lba;
         eu16 secCnt = m_lbaColl[i].secCnt;
         // Read lba 512 byte

@@ -68,8 +68,8 @@ void CmdIf::send_cmd(eu8* cdb, eu8* buffer, eu32 byteCnt, eu8 direction, estring
 
 vector<estring> CmdIf::get_device_name(void) {
     vector<estring> dn;
-    dn.push_back(_ET("C:\\"));
-    dn.push_back(_ET("D:\\"));
+    dn.push_back(_ET("Fake_C:\\"));
+    dn.push_back(_ET("Fake_D:\\"));
     return dn;
 }
 
