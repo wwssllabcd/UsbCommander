@@ -14,11 +14,11 @@ RandomWrite::RandomWrite(CmdIf& usbcmd) {
 RandomWrite::~RandomWrite() {
 }
 
-void RandomWrite::lbaWrite(eu32 lba, eu16 cnt, eu8* buf) {
+void RandomWrite::lbaWrite(eu32 lba, eu16 cnt, eu8_p buf) {
     m_usbCmd.write10(lba, cnt, buf);
 }
 
-void RandomWrite::lbaRead(eu32 lba, eu16 cnt, eu8* buf) {
+void RandomWrite::lbaRead(eu32 lba, eu16 cnt, eu8_p buf) {
     m_usbCmd.read10(lba, cnt, buf);
 }
 
@@ -235,7 +235,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
     return;
 }
 
-void RandomWrite::compareData(eu8* writeBuf, eu8* readBuf, eu32 byteCnt, eu32 writeLba) {
+void RandomWrite::compareData(eu8_p writeBuf, eu8_p readBuf, eu32 byteCnt, eu32 writeLba) {
     int result = memcmp(readBuf, writeBuf, byteCnt);
     //印出哪裡有問題
     if (result != 0) {
@@ -283,7 +283,7 @@ void RandomWrite::verifyRecordLba() {
     }
 }
 
-estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu32 byteCnt, eu8* writeBuf, eu8* readBuf) {
+estring RandomWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu32 byteCnt, eu8_p writeBuf, eu8_p readBuf) {
 	estring result, msg;
 	Utility su;
 	int errorCnt = 0;

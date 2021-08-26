@@ -19,11 +19,11 @@ SequenceWrite::SequenceWrite(const CmdIf& usbCmd) {
 SequenceWrite::~SequenceWrite() {
 }
 
-void SequenceWrite::lbaWrite(eu32 lba, eu16 cnt, eu8* buf) {
+void SequenceWrite::lbaWrite(eu32 lba, eu16 cnt, eu8_p buf) {
 	m_usbCmd.write10(lba, cnt, buf);
 }
 
-void SequenceWrite::lbaRead(eu32 lba, eu16 cnt, eu8* buf) {
+void SequenceWrite::lbaRead(eu32 lba, eu16 cnt, eu8_p buf) {
 	m_usbCmd.read10(lba, cnt, buf);
 }
 
@@ -43,7 +43,7 @@ bool SequenceWrite::sequenceWrite(SequenceWriteUi& ui) {
 	);
 }
 
-estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8* pWriteBuf, eu8* pReadBuf){
+estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8_p pWriteBuf, eu8_p pReadBuf){
 	estring msg;
     Utility su;
 	msg = Utility::crLf();
@@ -63,8 +63,8 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 	eu8 m_readBuf[DATA_BUFFER_SIZE];
 	eu8 m_writeBuf[DATA_BUFFER_SIZE];
 
-	eu8* pWriteBuf = m_writeBuf;
-	eu8* pReadBuf = m_readBuf;
+	eu8_p pWriteBuf = m_writeBuf;
+	eu8_p pReadBuf = m_readBuf;
 
 	eu32 dataLen = secCnt * BYTE_PER_SECTOR;
 	if (dataLen > sizeof(m_readBuf)) {
@@ -125,7 +125,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 }
 
-estring SequenceWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf) {
+estring SequenceWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8_p writeBuf, eu8_p readBuf) {
 	estring result, msg;
 	Utility su;
 	int errorCnt = 0;

@@ -19,12 +19,12 @@ public:
 	
 
 private:
-    CmdIf m_usbCmd;
-	void lbaWrite(eu32 lba, eu16 secLen, eu8* buffer);
-	void lbaRead(eu32 lba, eu16 secLen, eu8* buffer);
+	CmdIf m_usbCmd;
+	void lbaWrite(eu32 lba, eu16 secLen, eu8_p buffer);
+	void lbaRead(eu32 lba, eu16 secLen, eu8_p buffer);
 	void vdrReboot();
-	estring genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8* pWriteBuf, eu8* pReadBuf);
-	estring getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8* writeBuf, eu8* readBuf);
+	estring genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32 curLba, eu32 step, int howManyStep, eu8_p pWriteBuf, eu8_p pReadBuf);
+	estring getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8_p writeBuf, eu8_p readBuf);
 
 	Utility m_u;
 
