@@ -149,9 +149,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\DriverAdapter\CmdIf.h" />
-    <ClInclude Include="src\DriverAdapter\SimpleFtl.h" />
-    <ClInclude Include="src\DriverAdapter\UsbCmdStruct.h" />
     <ClInclude Include="src\RandomWrite\RandomWrite.h" />
     <ClInclude Include="src\RandomWrite\RandomWriteUi.h" />
     <ClInclude Include="src\SequenceWrite\SequenceWrite.h" />
@@ -163,9 +160,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\DriverAdapter\CmdIf.cpp" />
-    <ClCompile Include="src\DriverAdapter\SimpleFtl.cpp" />
-    <ClCompile Include="src\DriverAdapter\UsbCmdStruct.cpp" />
     <ClCompile Include="src\RandomWrite\RandomWrite.cpp" />
     <ClCompile Include="src\RandomWrite\RandomWriteUi.cpp" />
     <ClCompile Include="src\SequenceWrite\SequenceWrite.cpp" />

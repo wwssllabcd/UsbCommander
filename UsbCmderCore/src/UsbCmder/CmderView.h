@@ -9,7 +9,7 @@
 #include "UtilityDialog/DialogUtility.h"
 #include "Utility/Utility.h"
 
-#include "DriverAdapter/UsbCmdStruct.h"
+#include "Scsi/ScsiCmd.h"
 
 using namespace EricCore;
 
@@ -48,9 +48,9 @@ public:
 
 	void driveSelectChange();
 	void selectChange();
-	UsbCmdStruct loadCmdSetFromUI(eu32 partialSetCtrl = NULL_32);
+	ScsiCmd loadCmdSetFromUI(eu32 partialSetCtrl = NULL_32);
 	int getShiftNo(bool isIncrease);
-	void setLbaToUI(const UsbCmdStruct& cmdset);
+	void setLbaToUI(const ScsiCmd& cmdset);
 
 	estring getHandleString();
 	void closeCheckBtn(void);
@@ -81,16 +81,16 @@ private:
 	CStatic* m_lblSysMsg;
 
 	
-	UsbCmdSet m_totalCmdSet;
-	UsbCmdSet loadTotalCmdSet();
+	ScsiCmdSet m_totalCmdSet;
+	ScsiCmdSet loadTotalCmdSet();
 
-	void setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl = NULL_32);
-	void loadExtCmdSet(UsbCmdSet& totalCmdSet);
-	void setTotalCmdToForm(const UsbCmdSet& totalCmdSet);
+	void setCmdSetToUI(const ScsiCmd& objCmd, eu32 partialSetCtrl = NULL_32);
+	void loadExtCmdSet(ScsiCmdSet& totalCmdSet);
+	void setTotalCmdToForm(const ScsiCmdSet& totalCmdSet);
 	void setDataLenToUi(eu32 length);
 	int getDataLenFromUi();
-	void setDirectionToUi(eu8 direction);
-	eu8 getDirectionFromUi(void);
+	void setDirectionToUi(ScsiIoDir direction);
+	ScsiIoDir getDirectionFromUi(void);
 	void sendMsgBase(CEdit* pMsgArea, bool isClean, estring_cr msg);
 };
 

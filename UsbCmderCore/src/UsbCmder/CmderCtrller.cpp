@@ -6,11 +6,15 @@
 #include "SequenceWrite/SequenceWrite.h"
 #include "RandomWrite/RandomWrite.h"
 
-#include "DriverAdapter/UsbCmdStruct.h"
+#include "Scsi/ScsiCmd.h"
 
 #include "Utility/Observer.h"
 #include "Utility/Utility.h"
 #include "Utility/EricException.h"
+#include "Utility/Singleton.h"
+
+#include "scsi/ScsiFun.h"
+
 
 #define NULL_32 (0xFFFFFFFF)
 
@@ -20,7 +24,7 @@ CmderCtrller::CmderCtrller(){
 CmderCtrller::~CmderCtrller(){
 }
 
-void CmderCtrller::lba_up_down_ctrl(UsbCmdStruct& curUsbCmd, bool isIncrease) {
+void CmderCtrller::lba_up_down_ctrl(ScsiCmd& curUsbCmd, bool isIncrease) {
 	const int offset = 2;
 	int shift = m_view.getShiftNo(isIncrease);
 
@@ -32,7 +36,7 @@ void CmderCtrller::lba_up_down_ctrl(UsbCmdStruct& curUsbCmd, bool isIncrease) {
 }
 
 void CmderCtrller::pageUp() {
-	UsbCmdStruct usbCmd = m_view.loadCmdSetFromUI();
+	ScsiCmd usbCmd = m_view.loadCmdSetFromUI();
 	eu8 cmd = usbCmd.cdb[0];
 
 	// lba
@@ -44,7 +48,7 @@ void CmderCtrller::pageUp() {
 }
 
 void CmderCtrller::pageDown() {
-	UsbCmdStruct usbCmd = m_view.loadCmdSetFromUI();
+	ScsiCmd usbCmd = m_view.loadCmdSetFromUI();
 	eu8 cmd = usbCmd.cdb[0];
 
 	// lba
@@ -55,17 +59,17 @@ void CmderCtrller::pageDown() {
 	}
 }
 
-eu32 CmderCtrller::toLba(UsbCmdStruct cmd) {
+eu32 CmderCtrller::toLba(ScsiCmd cmd) {
 	return m_u.toU32(&cmd.cdb[2]);
 }
 
-void CmderCtrller::executeUsbCmd(UsbCmdStruct cmd) {
+void CmderCtrller::executeUsbCmd(ScsiCmd cmd) {
 	memset(pc_buffer, 0xcc, sizeof(pc_buffer)); // init buffer
 	if(cmd.cdb[0] == UFI_OP_WRITE_10) {
 		m_u.makeBuf(toLba(cmd), cmd.length, pc_buffer);
 	}
 
-	CmdIf usbCmd = get_cmdif();
+	ScsiIf usbCmd = get_cmdif();
     usbCmd.send_cmd(cmd, pc_buffer);
 
     Utility su;
@@ -84,16 +88,10 @@ void CmderCtrller::execute() {
 	}
 }
 
-CmdIf CmderCtrller::get_cmdif() {
-    m_CmdIf.m_curSel = m_view.getDriveSel();
-    m_CmdIf.m_type = 1;
-    return m_CmdIf;
-}
-
 eu32 CmderCtrller::getCapacity() {
-    CmdIf usbCmd = get_cmdif();
+	ScsiIf usbCmd = get_cmdif();
 	eu8 buffer[8];
-	usbCmd.readCapacity(buffer);
+	usbCmd.read_capacity(buffer);
 	eu32 res = m_u.toU32(buffer);
 	return res;
 }
@@ -109,7 +107,7 @@ void CmderCtrller::seEndLba() {
 
 void CmderCtrller::squenceWrite() {
 	CmderView* view = &m_view;
-    CmdIf usbCmd = get_cmdif();
+	ScsiIf usbCmd = get_cmdif();
 	seEndLba();
 	
 	SequenceWrite sw(usbCmd);
@@ -118,17 +116,23 @@ void CmderCtrller::squenceWrite() {
 
 void CmderCtrller::randomWrite() {
 	CmderView* view = &m_view;
-    CmdIf usbCmd = get_cmdif();
+	ScsiIf usbCmd = get_cmdif();
 	seEndLba();
 	
 	RandomWrite rw(usbCmd);
 	rw.randomWrite(m_view.m_rdmWriteUi);
 }
 
+ScsiIf CmderCtrller::get_cmdif() {
+	eu32 sel = m_view.getDriveSel();
+	ScsiIf scsi = m_scsiFun.get_form_singleton(sel);
+	return scsi;
+}
+
 void CmderCtrller::refresh() {
-    CmdIf cmdif = get_cmdif();
-    cmdif.release_device();
-    m_view.set_device_box(cmdif.get_device_name());
+	m_scsiFun.release();
+	m_scsiFun.put_into_singleton(m_scsiFun.scan_device(0));
+    m_view.set_device_box(m_scsiFun.get_device_name());
 }
 
 void CmderCtrller::init() {

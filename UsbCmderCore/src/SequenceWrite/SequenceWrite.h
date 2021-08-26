@@ -2,7 +2,7 @@
 
 #include "DefineFiles/EricType.h"
 #include "SequenceWriteUi.h"
-#include "DriverAdapter/CmdIf.h"
+#include "Scsi/ScsiIf.h"
 
 #include "Utility/Utility.h"
 
@@ -11,7 +11,7 @@ using namespace EricCore;
 class SequenceWrite
 {
 public:
-	SequenceWrite(const CmdIf& usbCmd);
+	SequenceWrite(const ScsiIf& usbCmd);
 	~SequenceWrite();
 
 	bool sequenceWrite(SequenceWriteUi& ui);
@@ -19,7 +19,7 @@ public:
 	
 
 private:
-	CmdIf m_usbCmd;
+	ScsiIf m_usbCmd;
 	void lbaWrite(eu32 lba, eu16 secLen, eu8_p buffer);
 	void lbaRead(eu32 lba, eu16 secLen, eu8_p buffer);
 	void vdrReboot();

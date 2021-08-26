@@ -2,9 +2,11 @@
 //Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
 
 #include "CmderView.h"
-#include "DriverAdapter/CmdIf.h"
+#include "Scsi/ScsiIf.h"
 
 #include "Utility/Utility.h"
+
+#include "Scsi/ScsiFun.h"
 
 using namespace EricCore;
 
@@ -28,18 +30,20 @@ public:
     CmderView m_view;
 
 private:
-    void executeUsbCmd(UsbCmdStruct cmd);
+    void executeUsbCmd(ScsiCmd cmd);
     eu32 getCapacity();
-	eu32 toLba(UsbCmdStruct cmd);
-	void lba_up_down_ctrl(UsbCmdStruct& curUsbCmd, bool isIncrease);
+	eu32 toLba(ScsiCmd cmd);
+	void lba_up_down_ctrl(ScsiCmd& curUsbCmd, bool isIncrease);
 	void seEndLba();
-    CmdIf get_cmdif();
+	ScsiIf get_cmdif();
 
 	eu8 pc_buffer[_256K];
 	eu8 readBuf[_64K];
 	eu8 writeBuf[_64K];
-    CmdIf m_CmdIf;
+	ScsiIf m_CmdIf;
 
 	Utility m_u;
+
+	ScsiFun m_scsiFun;
 };
 

@@ -6,13 +6,13 @@
 #include "Utility/Utility.h"
 #include "Utility/Observer.h"
 #include "Utility/EricException.h"
-#include "DriverAdapter/UsbCmdStruct.h"
+#include "Scsi/ScsiCmd.h"
 
 
 #define DATA_BUFFER_SIZE (_256K)
 
 
-SequenceWrite::SequenceWrite(const CmdIf& usbCmd) {
+SequenceWrite::SequenceWrite(const ScsiIf& usbCmd) {
 	this->m_usbCmd = usbCmd;
 }
 
@@ -20,15 +20,15 @@ SequenceWrite::~SequenceWrite() {
 }
 
 void SequenceWrite::lbaWrite(eu32 lba, eu16 cnt, eu8_p buf) {
-	m_usbCmd.write10(lba, cnt, buf);
+	m_usbCmd.write_10(lba, cnt, buf);
 }
 
 void SequenceWrite::lbaRead(eu32 lba, eu16 cnt, eu8_p buf) {
-	m_usbCmd.read10(lba, cnt, buf);
+	m_usbCmd.read_10(lba, cnt, buf);
 }
 
 void SequenceWrite::vdrReboot() {
-	m_usbCmd.vdrReboot();
+	//m_usbCmd.vdrReboot();
 }
 
 bool SequenceWrite::sequenceWrite(SequenceWriteUi& ui) {

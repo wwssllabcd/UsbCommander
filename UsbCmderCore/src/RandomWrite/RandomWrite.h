@@ -2,14 +2,14 @@
 
 #include "RandomWriteUi.h"
 #include "Utility/Utility.h"
-#include "DriverAdapter/CmdIf.h"
+#include "Scsi/ScsiIf.h"
 
 using namespace EricCore;
 
 class RandomWrite
 {
 public:
-	RandomWrite(CmdIf& usbcmd);
+	RandomWrite(ScsiIf& usbcmd);
 	~RandomWrite();
 
 	void randomWrite(RandomWriteUi& ui);
@@ -22,7 +22,7 @@ private:
 	}RdmWriteCk;
 
 	vector<RdmWriteCk> m_lbaColl;
-    CmdIf m_usbCmd;
+	ScsiIf m_usbCmd;
 
 	eu32 getWriteLba(eu32 startLba, eu32 endLba, eu32 secCnt, eu32 count);
 	eu8 getSecCnt(eu16 secRange);

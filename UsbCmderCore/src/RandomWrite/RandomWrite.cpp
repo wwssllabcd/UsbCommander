@@ -7,7 +7,7 @@
 #include "Utility/EricException.h"
 
 #define DATA_BUFFER_SIZE    (_256K)
-RandomWrite::RandomWrite(CmdIf& usbcmd) {
+RandomWrite::RandomWrite(ScsiIf& usbcmd) {
     this->m_usbCmd = usbcmd;
 }
 
@@ -15,15 +15,15 @@ RandomWrite::~RandomWrite() {
 }
 
 void RandomWrite::lbaWrite(eu32 lba, eu16 cnt, eu8_p buf) {
-    m_usbCmd.write10(lba, cnt, buf);
+    m_usbCmd.write_10(lba, cnt, buf);
 }
 
 void RandomWrite::lbaRead(eu32 lba, eu16 cnt, eu8_p buf) {
-    m_usbCmd.read10(lba, cnt, buf);
+    m_usbCmd.read_10(lba, cnt, buf);
 }
 
 void RandomWrite::vdrReboot() {
-    m_usbCmd.vdrReboot();
+    //m_usbCmd.vdrReboot();
 }
 
 estring RandomWrite::makeHeader(eu32 startLba, eu32 endLba, eu32 seed) {

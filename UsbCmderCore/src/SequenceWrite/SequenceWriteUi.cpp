@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "SequenceWriteUi.h"
-#include "DriverAdapter\UsbCmdStruct.h"
+#include "Scsi/ScsiCmd.h"
 
 SequenceWriteUi::SequenceWriteUi()
     :m_startLba(0)

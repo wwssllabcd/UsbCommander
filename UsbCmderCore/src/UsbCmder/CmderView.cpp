@@ -63,9 +63,11 @@ void CmderView::setup_ui_num_to_view(UsbCmderMfcUiNum* const uiNumObj) {
     );
 }
 
+#define	FLAG_DATA_IN			0x00000001
+#define	FLAG_DATA_OUT			0x00000000
 
-void CmderView::setDirectionToUi(eu8 direction) {
-	if (direction == 0x02) {
+void CmderView::setDirectionToUi(ScsiIoDir direction) {
+	if (direction == ScsiIoDir::DATA_IN) {
 		m_pDataIn->SetCheck(true);
 		m_pDataOut->SetCheck(false);
 	} else {
@@ -74,16 +76,16 @@ void CmderView::setDirectionToUi(eu8 direction) {
 	}
 }
 
-eu8 CmderView::getDirectionFromUi(void) {
+ScsiIoDir CmderView::getDirectionFromUi(void) {
 	int isDataIn = m_pDataIn->GetCheck();
 	int isDataOut = m_pDataOut->GetCheck();
 	if (isDataIn == 1) {
-		return  0x02;
+		return  ScsiIoDir::DATA_IN;
 	}
 	if (isDataOut == 1) {
-		return  0x04;
+		return  ScsiIoDir::DATA_OUT;
 	}
-	return 0;
+	return ScsiIoDir::NON_DATA;
 }
 
 void CmderView::setDataLenToUi(eu32 length) {
@@ -96,8 +98,8 @@ int CmderView::getDataLenFromUi() {
     return m_u.hexToU32(m_du.getText<CEdit>(m_pDataLen));
 }
 
-UsbCmdStruct CmderView::loadCmdSetFromUI(eu32 partialSetCtrl) {
-	UsbCmdStruct objCmd;
+ScsiCmd CmderView::loadCmdSetFromUI(eu32 partialSetCtrl) {
+	ScsiCmd objCmd;
 
 	for (int i = 0; i < MAX_CDB_OF_UI; i++) {
 		if (partialSetCtrl& (1 << i)) {
@@ -113,7 +115,7 @@ UsbCmdStruct CmderView::loadCmdSetFromUI(eu32 partialSetCtrl) {
 	return objCmd;
 }
 
-void CmderView::setCmdSetToUI(const UsbCmdStruct& objCmd, eu32 partialSetCtrl) {
+void CmderView::setCmdSetToUI(const ScsiCmd& objCmd, eu32 partialSetCtrl) {
     Utility su;
 	for (int i = 0; i < MAX_CDB_OF_UI; i++) {
 		if (partialSetCtrl& (1 << i)) {
@@ -138,21 +140,21 @@ void CmderView::selectChange() {
 	if (curSel == -1) {
 		return;
 	}
-	UsbCmdStruct objCmd = m_totalCmdSet[curSel];
+	ScsiCmd objCmd = m_totalCmdSet[curSel];
 	setCmdSetToUI(objCmd);
 }
 
-void CmderView::loadExtCmdSet(UsbCmdSet& totalCmdSet) {
+void CmderView::loadExtCmdSet(ScsiCmdSet& totalCmdSet) {
 }
 
-UsbCmdSet CmderView::loadTotalCmdSet() {
-	UsbCmdStruct usbStruct;
-	UsbCmdSet totalCmdSet = usbStruct.getAllCommandSet();
+ScsiCmdSet CmderView::loadTotalCmdSet() {
+	ScsiCmd usbStruct;
+	ScsiCmdSet totalCmdSet = usbStruct.get_all_command_set();
 	loadExtCmdSet(totalCmdSet);
 	return totalCmdSet;
 }
 
-void CmderView::setTotalCmdToForm(const UsbCmdSet& totalCmdSet) {
+void CmderView::setTotalCmdToForm(const ScsiCmdSet& totalCmdSet) {
 	size_t cmdCount = totalCmdSet.size();
     Utility su;
 	for (size_t i = 0; i < cmdCount; i++) {
@@ -189,7 +191,7 @@ int CmderView::getShiftNo(bool isIncrease) {
 	return res;
 }
 
-void CmderView::setLbaToUI(const UsbCmdStruct& cmdset) {
+void CmderView::setLbaToUI(const ScsiCmd& cmdset) {
 	setCmdSetToUI(cmdset, 0x3C);
 }
 
