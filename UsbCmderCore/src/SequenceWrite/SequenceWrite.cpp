@@ -52,7 +52,7 @@ estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32
 	msg += _ET("Stop at step No.") + su.toString(howManyStep) + Utility::crLf() + Utility::crLf();
 	msg += getDiffStringInTwoBuf(curLba, secCnt, pWriteBuf, pReadBuf);
 
-	estring strReadBuf = su.makeHexTable(secCnt * BYTE_PER_SECTOR, pReadBuf);
+	estring strReadBuf = su.makeHexTable(SECTOR_TO_BYTE(secCnt), pReadBuf);
 	msg += Utility::crLf() + Utility::crLf() + _ET("======= Read Buf ========= ") + Utility::crLf() + strReadBuf;
 
 	return msg;
@@ -66,7 +66,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 	eu8_p pWriteBuf = m_writeBuf;
 	eu8_p pReadBuf = m_readBuf;
 
-	eu32 dataLen = secCnt * BYTE_PER_SECTOR;
+	eu32 dataLen = SECTOR_TO_BYTE(secCnt);
 	if (dataLen > sizeof(m_readBuf)) {
 		THROW_MYEXCEPTION(0, _ET("SeqW: buffer OFB"));
 	}
@@ -131,7 +131,7 @@ estring SequenceWrite::getDiffStringInTwoBuf(eu32 lbaAddr, eu16 secCnt, eu8_p wr
 	int errorCnt = 0;
 	result = Utility::crLf() + su.strFormat(_ET(" cmp error in lbaAddr = %x"), lbaAddr);
 
-	for (int g = 0; g < secCnt*BYTE_PER_SECTOR; g++) {
+	for (int g = 0; g < SECTOR_TO_BYTE(secCnt); g++) {
 		if (writeBuf[g] != readBuf[g]) {
 			if (errorCnt < 20) {
 				msg = su.strFormat(_ET("  writeBuf[%x]=0x%x,readBuf[%x]=0x%x"), g, writeBuf[g], g, readBuf[g]);

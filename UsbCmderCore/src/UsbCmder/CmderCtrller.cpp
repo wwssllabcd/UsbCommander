@@ -131,7 +131,7 @@ ScsiIf CmderCtrller::get_cmdif() {
 
 void CmderCtrller::refresh() {
 	m_scsiFun.release();
-	m_scsiFun.put_into_singleton(m_scsiFun.scan_device(0));
+	m_scsiFun.setup_singleton(m_scsiFun.scan_device(0));
     m_view.set_device_box(m_scsiFun.get_device_name());
 }
 

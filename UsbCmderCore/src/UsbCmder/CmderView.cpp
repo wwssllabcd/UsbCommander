@@ -173,9 +173,9 @@ void CmderView::setDlgPointer(CDialog* dialogPtr) {
 
 void CmderView::set_device_box(vector<estring> deviceName) {
     m_cboDriveSel->ResetContent();
-    for (size_t i = 0; i < deviceName.size(); i++) {
-        m_cboDriveSel->AddString(deviceName[i].c_str());
-    }
+	for (auto item : deviceName) {
+		m_cboDriveSel->AddString(item.c_str());
+	}
     m_cboDriveSel->SetCurSel(0);
 	driveSelectChange();
 }
