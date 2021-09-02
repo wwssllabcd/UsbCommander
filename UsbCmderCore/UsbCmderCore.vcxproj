@@ -106,7 +106,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\EricCoreCpp\src;..\FTL_LIB\src;..\UsbCmderCore\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\EricCoreCpp\src;..\DeviceCtrl\src;..\UsbCmderCore\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
