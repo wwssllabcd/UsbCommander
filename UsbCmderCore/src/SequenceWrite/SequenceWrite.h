@@ -2,7 +2,7 @@
 
 #include "DefineFiles/EricType.h"
 #include "SequenceWriteUi.h"
-#include "Scsi/ScsiIf.h"
+#include "ScsiUtility/ScsiIf.h"
 
 #include "Utility/Utility.h"
 

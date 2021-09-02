@@ -2,7 +2,7 @@
 
 #include "RandomWriteUi.h"
 #include "Utility/Utility.h"
-#include "Scsi/ScsiIf.h"
+#include "ScsiUtility/ScsiIf.h"
 
 using namespace EricCore;
 

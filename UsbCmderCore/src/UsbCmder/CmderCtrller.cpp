@@ -1,4 +1,4 @@
-﻿//Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
+﻿
 
 #include "stdafx.h"
 #include "CmderCtrller.h"
@@ -6,14 +6,14 @@
 #include "SequenceWrite/SequenceWrite.h"
 #include "RandomWrite/RandomWrite.h"
 
-#include "Scsi/ScsiCmd.h"
+#include "ScsiUtility/ScsiCmd.h"
+#include "ScsiUtility/ScsiFun.h"
 
 #include "Utility/Observer.h"
 #include "Utility/Utility.h"
 #include "Utility/EricException.h"
 #include "Utility/Singleton.h"
 
-#include "scsi/ScsiFun.h"
 
 
 #define NULL_32 (0xFFFFFFFF)
@@ -138,6 +138,7 @@ void CmderCtrller::refresh() {
 void CmderCtrller::init() {
     m_view.init();
     refresh();
+	m_CmdIf.init_disk();
 }
 
 void CmderCtrller::close() {

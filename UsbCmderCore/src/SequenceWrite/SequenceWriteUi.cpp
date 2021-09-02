@@ -1,8 +1,8 @@
-﻿//Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
+﻿
 
 #include "stdafx.h"
 #include "SequenceWriteUi.h"
-#include "Scsi/ScsiCmd.h"
+#include "ScsiUtility/ScsiCmd.h"
 
 SequenceWriteUi::SequenceWriteUi()
     :m_startLba(0)

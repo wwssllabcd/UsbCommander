@@ -1,4 +1,4 @@
-﻿//Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
+﻿
 
 #include "stdafx.h"
 #include "RandomWrite.h"

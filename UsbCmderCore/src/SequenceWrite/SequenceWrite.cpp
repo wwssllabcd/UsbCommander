@@ -1,4 +1,4 @@
-﻿//Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
+﻿
 
 #include "stdafx.h"
 
@@ -6,7 +6,7 @@
 #include "Utility/Utility.h"
 #include "Utility/Observer.h"
 #include "Utility/EricException.h"
-#include "Scsi/ScsiCmd.h"
+#include "ScsiUtility/ScsiCmd.h"
 
 
 #define DATA_BUFFER_SIZE (_256K)

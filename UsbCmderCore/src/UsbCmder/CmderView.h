@@ -9,7 +9,7 @@
 #include "UtilityDialog/DialogUtility.h"
 #include "Utility/Utility.h"
 
-#include "Scsi/ScsiCmd.h"
+#include "ScsiUtility/ScsiCmd.h"
 
 using namespace EricCore;
 

@@ -119,6 +119,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <StackReserveSize>0x300000</StackReserveSize>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -213,6 +214,9 @@
     <Image Include="res\UsbCommander.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EricCoreCpp\EricCoreCpp.vcxproj">
+      <Project>{3c796ff3-e764-4ba4-9101-b3b7ea47d1c1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\UsbCmderCore\UsbCmderCore.vcxproj">
       <Project>{02cfa684-7e8a-4b74-8c6c-48c5cd097353}</Project>
     </ProjectReference>

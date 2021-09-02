@@ -1,15 +1,14 @@
 ﻿#pragma once
-//Copyright © 2006- EricWang(wwssllabcd@gmail.com). All rights reserved
+
 
 #include "CmderView.h"
-#include "Scsi/ScsiIf.h"
+
+#include "ScsiUtility/ScsiIf.h"
+#include "ScsiUtility/ScsiFun.h"
 
 #include "Utility/Utility.h"
 
-#include "Scsi/ScsiFun.h"
-
 using namespace EricCore;
-
 
 class CmderCtrller
 {
