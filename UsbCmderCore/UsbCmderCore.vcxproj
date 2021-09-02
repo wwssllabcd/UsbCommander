@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\EricCoreCpp\src;..\DeviceCtrl\src;..\UsbCmderCore\src;..\FTL_LIB\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\EricCoreCpp\src;..\DeviceCtrl\src;..\UsbCmderCore\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -181,9 +181,6 @@
     </ProjectReference>
     <ProjectReference Include="..\EricCoreCpp\EricCoreCpp.vcxproj">
       <Project>{3c796ff3-e764-4ba4-9101-b3b7ea47d1c1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\FTL_LIB\FTL_LIB.vcxproj">
-      <Project>{251e082a-285e-47ba-bf40-2bca7c513ed1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
