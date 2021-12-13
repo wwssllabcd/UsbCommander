@@ -18,6 +18,14 @@
 
 #define NULL_32 (0xFFFFFFFF)
 
+bool check_filter(DeviceInfo& deviceInfo) {
+	ScsiFun scsiFun;
+	if (scsiFun.is_usb_bus_type(deviceInfo) == false) {
+		return false;
+	}
+	return true;
+}
+
 CmderCtrller::CmderCtrller(){
 }
 
@@ -131,7 +139,7 @@ ScsiIf CmderCtrller::get_cmdif() {
 
 void CmderCtrller::refresh() {
 	m_scsiFun.release();
-	m_scsiFun.setup_singleton(m_scsiFun.scan_device(0));
+	m_scsiFun.setup_singleton(m_scsiFun.scan_device(ScanType::physicalDriver, check_filter));
     m_view.set_device_box(m_scsiFun.get_device_name());
 }
 

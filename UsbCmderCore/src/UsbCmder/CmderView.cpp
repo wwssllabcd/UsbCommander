@@ -5,6 +5,8 @@
 #include "DefineFiles\DefBitConst.h"
 #include "Utility/Utility.h"
 
+#include "ScsiUtility/DefineScsi.h" //for title
+
 #define MAX_TEXTBOX_SIZE (0x6000)
 
 CmderView::CmderView()
@@ -28,6 +30,12 @@ void CmderView::init(void) {
     m_cboDriveSel->SetCurSel(0);
     m_cboCmdSel->SetCurSel(0);
     selectChange();
+
+#ifdef ENABLE_4k_SEC_LEN
+	estring title = m_du.getText(m_pDialog);
+	title += _ET(" (Lba 4K)");
+	m_du.setText(m_pDialog, title);
+#endif
 }
 
 void CmderView::setup_ui_item(int deviceSel, int cmdSel, int* srcId_cdb,
