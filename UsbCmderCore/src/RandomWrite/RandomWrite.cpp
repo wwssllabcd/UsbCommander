@@ -82,7 +82,7 @@ eu8 RandomWrite::getSecCnt(eu16 secRange) {
 void RandomWrite::clearTextArea(estring titleMsg, eu32 count) {
     if ((count % 0x80) == 0) {
         SEND_MSG_CLEAR();
-        SEND_MSG_STR(titleMsg);
+        SEND_MSG_ESTR(titleMsg);
     }
     DialogUtility::update_message();
 }
@@ -152,7 +152,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 	bool isNoRead = ui.isNoRead();
 	
 
-    eu32 maxBufLen = SECTOR_TO_BYTE(secRange);
+    eu32 maxBufLen = SEC_TO_BYTE(secRange);
 	if (maxBufLen > sizeof(pReadBuf)) {
 		THROW_MYEXCEPTION(0, _ET("RdmW: buffer OFB"));
 	}
@@ -168,7 +168,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
     
     titleMsg = makeHeader(startLba, endLba, seed);
     SEND_MSG_CLEAR();
-    SEND_MSG_STR(titleMsg);
+    SEND_MSG_ESTR(titleMsg);
 
     srand(seed);
 
@@ -207,7 +207,7 @@ void RandomWrite::randomWrite(RandomWriteUi& ui) {
 			SEND_MSG(_ET("(%x)W/R LBA=0x%x, secCnt=0x%x, TotalMB=%d"), count, writeLba, secCnt, totalMB);
 		}
 
-        eu32 byteCnt = SECTOR_TO_BYTE(secCnt);
+        eu32 byteCnt = SEC_TO_BYTE(secCnt);
 
         // make buffer
         m_u.makeBuf(writeLba, byteCnt, pWriteBuf);
@@ -240,9 +240,9 @@ void RandomWrite::compareData(eu8_p writeBuf, eu8_p readBuf, eu32 byteCnt, eu32 
     //印出哪裡有問題
     if (result != 0) {
         estring msg = _ET("..fail");
-        SEND_MSG_STR(msg);
+        SEND_MSG_ESTR(msg);
         msg = getDiffStringInTwoBuf(writeLba, byteCnt, writeBuf, readBuf);
-        SEND_MSG_STR(msg);
+        SEND_MSG_ESTR(msg);
         THROW_MYEXCEPTION(0, _ET("RandomWrite Fail"));
     } 
 }
@@ -262,7 +262,7 @@ void RandomWrite::verifyRecordLba() {
 
         lbaRead(lba, secCnt, readBuf);
 
-        eu32 dataLen = SECTOR_TO_BYTE(secCnt);
+        eu32 dataLen = SEC_TO_BYTE(secCnt);
 
         // make buffer
         m_u.makeBuf(lba, dataLen, compBuf);
@@ -273,7 +273,7 @@ void RandomWrite::verifyRecordLba() {
             estring msg = _ET("\r\n--- Verify Record fail step=") + su.toHexString(i);
             msg += _ET("\r\n LBA =") + su.toHexString(lba) + _ET(", len =") + su.toHexString(secCnt);
             msg += getDiffStringInTwoBuf(lba, secCnt, compBuf, readBuf);
-            SEND_MSG_STR(msg);
+            SEND_MSG_ESTR(msg);
             THROW_MYEXCEPTION(0, _ET("verifyRecordLba error"));
         }
     }

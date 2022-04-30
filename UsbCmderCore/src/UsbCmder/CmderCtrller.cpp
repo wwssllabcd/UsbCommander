@@ -140,7 +140,7 @@ ScsiIf CmderCtrller::get_cmdif() {
 void CmderCtrller::refresh() {
 	m_scsiFun.release();
 	m_scsiFun.setup_singleton(m_scsiFun.scan_device(ScanType::physicalDriver, check_filter));
-    m_view.set_device_box(m_scsiFun.get_device_name());
+    m_view.set_device_box(m_scsiFun.get_device_description());
 }
 
 void CmderCtrller::init() {

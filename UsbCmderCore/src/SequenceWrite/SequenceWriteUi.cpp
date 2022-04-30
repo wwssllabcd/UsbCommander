@@ -34,7 +34,7 @@ void SequenceWriteUi::setItem(CEdit* startLba, CEdit* endLba, CEdit* secCnt, CEd
     m_stop = stop;
 
 	setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("80"), _ET("80"));
-	if (BYTE_PER_SECTOR == _4K) {
+	if (BYTE_PER_SEC == _4K) {
 		setDefaultValue(_ET("0"), _ET("FFFFFFFF"), _ET("20"), _ET("20"));
 	}
 }
