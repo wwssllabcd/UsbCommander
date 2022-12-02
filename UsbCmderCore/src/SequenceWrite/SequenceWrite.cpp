@@ -50,6 +50,7 @@ estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32
 	msg += _ET("start Addr=") + su.toHexString(startLba) + _ET(", End LBA=") + su.toHexString(endLba);
 	msg += _ET(", i+=") + su.toHexString(step) + _ET(", Len=") + su.toHexString(secCnt) + Utility::crLf();
 	msg += _ET("Stop at step No.") + su.toString(howManyStep) + Utility::crLf() + Utility::crLf();
+	msg += su.strFormat(_ET("fail in lba = %x"), curLba) + Utility::crLf();
 	msg += getDiffStringInTwoBuf(curLba, secCnt, pWriteBuf, pReadBuf);
 
 	estring strReadBuf = su.makeHexTable(SEC_TO_BYTE(secCnt), pReadBuf);
