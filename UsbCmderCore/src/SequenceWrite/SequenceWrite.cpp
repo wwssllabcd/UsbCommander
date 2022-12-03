@@ -121,8 +121,9 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 	estring msg;
 	int result = 0;
+	int howManyStep = 0;
 
-	for(eu32 lbaAddr = startLba; lbaAddr <= endLba; lbaAddr += step) {
+	for(eu32 lbaAddr = startLba; lbaAddr <= endLba; lbaAddr += step, howManyStep++) {
 		DialogUtility::update_message();
 		if(ui.isStop()) {
 			break;
@@ -141,7 +142,7 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 		if (res == false) {
 			SEND_MSG(_ET("Verify ... fail"));
-			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, step, m_writeBuf, m_readBuf);
+			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, m_writeBuf, m_readBuf);
 			SEND_MSG_ESTR_CTRL(msg, true, false);
 			return false;
 		}
