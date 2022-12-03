@@ -119,30 +119,21 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
 	preCheck(secCnt, sizeof(m_readBuf));
 
-	estring msg;
-	int result = 0;
 	int howManyStep = 0;
 
-	for(eu32 lbaAddr = startLba; lbaAddr <= endLba; lbaAddr += step, howManyStep++) {
+	for(eu32 lbaAddr = startLba; (lbaAddr + secCnt) <= endLba; lbaAddr += step, howManyStep++) {
 		DialogUtility::update_message();
 		if(ui.isStop()) {
 			break;
 		}
 
-		// adjust lbaOffset
-		if((lbaAddr + secCnt) > endLba) {
-			break;
-		}
-
         SEND_MSG_CLEAR();
-
-
 
 		bool res = execSeqOnce(lbaAddr, secCnt, isNoWrite, isNoRead, m_writeBuf, m_readBuf);
 
 		if (res == false) {
 			SEND_MSG(_ET("Verify ... fail"));
-			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, m_writeBuf, m_readBuf);
+			estring msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, m_writeBuf, m_readBuf);
 			SEND_MSG_ESTR_CTRL(msg, true, false);
 			return false;
 		}
