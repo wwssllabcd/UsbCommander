@@ -56,6 +56,8 @@ public:
 	void closeCheckBtn(void);
 	void sendMsgToDialogArea(bool isClean, estring_cr msg);
 	void sendMsgToAsciiArea(bool isClean, estring_cr msg);
+	void send_msg_to_status(estring_cr msg);
+
 	void showPopupWindows(estring_cr msg);
 
 	DialogUtility m_du;

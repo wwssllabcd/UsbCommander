@@ -71,9 +71,6 @@ void CmderView::setup_ui_num_to_view(UsbCmderMfcUiNum* const uiNumObj) {
     );
 }
 
-#define	FLAG_DATA_IN			0x00000001
-#define	FLAG_DATA_OUT			0x00000000
-
 void CmderView::setDirectionToUi(ScsiIoDir direction) {
 	if (direction == ScsiIoDir::DATA_IN) {
 		m_pDataIn->SetCheck(true);
@@ -231,13 +228,20 @@ void CmderView::sendMsgBase(CEdit* pMsgArea, bool isClean, estring_cr msg) {
 }
 
 void CmderView::sendMsgToDialogArea(bool isClean, estring_cr msg) {
+	m_du.update_message();
 	sendMsgBase(this->m_dialogMsg, isClean, msg);
 }
 
 void CmderView::sendMsgToAsciiArea(bool isClean, estring_cr msg) {
+	m_du.update_message();
 	sendMsgBase(this->m_asciiMsg, isClean, msg);
 }
 
 void CmderView::showPopupWindows(estring_cr msg) {
 	this->m_pDialog->MessageBox(msg.c_str());
 }
+
+void CmderView::send_msg_to_status(estring_cr msg) {
+	m_du.setText(m_lblSysMsg, msg);
+}
+
