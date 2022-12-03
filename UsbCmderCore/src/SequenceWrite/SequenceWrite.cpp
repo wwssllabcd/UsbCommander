@@ -31,14 +31,27 @@ void SequenceWrite::vdrReboot() {
 	//m_usbCmd.vdrReboot();
 }
 
+SeqWriteParam SequenceWrite::getSeqParamFromUi(SequenceWriteUi& ui) {
+	SeqWriteParam swp;
+
+	swp.sLba = ui.getStartLba();
+	swp.eLba = ui.getEndLba();
+	swp.step = ui.getStep();
+	swp.secCnt = ui.getSecCnt();
+	swp.isNoWrite = ui.isNoWrite();
+	swp.isNoRead = ui.isNoRead();
+	return swp;
+}
+
 bool SequenceWrite::sequenceWrite(SequenceWriteUi& ui) {
+	SeqWriteParam swp = getSeqParamFromUi(ui);
 	return sequenceWrite(
-		ui.getStartLba()
-		, ui.getEndLba()
-		, ui.getStep()
-		, ui.getSecCnt()
-		, ui.isNoWrite()
-		, ui.isNoRead()
+		swp.sLba
+		, swp.eLba
+		, swp.step
+		, swp.secCnt
+		, swp.isNoWrite
+		, swp.isNoRead
 		, ui
 	);
 }
@@ -59,25 +72,55 @@ estring SequenceWrite::genErrorMsg(eu32 startLba, eu32 endLba, eu16 secCnt, eu32
 	return msg;
 }
 
+void SequenceWrite::preCheck(eu16 secCnt, eu32 bufSize) {
+	if (secCnt == 0) {
+		THROW_MYEXCEPTION(0, _ET("SeqW: SecCnt=0"));
+	}
+
+	eu32 dataLen = SEC_TO_BYTE(secCnt);
+	if (dataLen > bufSize) {
+		THROW_MYEXCEPTION(0, _ET("SeqW: buffer OFB"));
+	}
+}
+
+bool SequenceWrite::execSeqOnce(eu32 lba, eu16 secCnt, bool isNoWrite, bool isNoRead, eu8_p wBuf, eu8_p rBuf) {
+	eu32 dataLen = SEC_TO_BYTE(secCnt);
+
+	m_u.makeBuf(lba, dataLen, wBuf);
+	if (isNoWrite) {
+		SEND_MSG(_ET("No Write LBA"));
+	} else {
+		SEND_MSG(_ET("Write LBA (0x%x), secCnt=0x%X"), lba, secCnt);
+
+		lbaWrite(lba, secCnt, wBuf);
+		SEND_MSG_CTRL(false, false, _ET(" ... pass"));
+		vdrReboot();
+	}
+
+	if (isNoRead) {
+		return true;
+	}
+
+	SEND_MSG(_ET("Read  LBA (0x%x), secCnt=0x%X"), lba, secCnt);
+	lbaRead(lba, secCnt, rBuf);
+	SEND_MSG_CTRL(false, false, _ET(" ... pass"));
+
+	int result = memcmp((eu8_p)rBuf, (eu8_p)wBuf, dataLen);
+	if (result != 0) {
+		return false;
+	}
+	return true;
+}
+
 bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 secCnt, bool isNoWrite, bool isNoRead, SequenceWriteUi& ui)
 {
 	eu8 m_readBuf[DATA_BUFFER_SIZE];
 	eu8 m_writeBuf[DATA_BUFFER_SIZE];
 
-	eu8_p pWriteBuf = m_writeBuf;
-	eu8_p pReadBuf = m_readBuf;
-
-	eu32 dataLen = SEC_TO_BYTE(secCnt);
-	if (dataLen > sizeof(m_readBuf)) {
-		THROW_MYEXCEPTION(0, _ET("SeqW: buffer OFB"));
-	}
+	preCheck(secCnt, sizeof(m_readBuf));
 
 	estring msg;
-	int howManyStep = 0;
 	int result = 0;
-	if(secCnt == 0) {
-		THROW_MYEXCEPTION(0, _ET("SeqW: SecCnt=0"));
-	}
 
 	for(eu32 lbaAddr = startLba; lbaAddr <= endLba; lbaAddr += step) {
 		DialogUtility::update_message();
@@ -92,34 +135,19 @@ bool SequenceWrite::sequenceWrite(eu32 startLba, eu32 endLba, eu32 step, eu16 se
 
         SEND_MSG_CLEAR();
 
-		m_u.makeBuf(lbaAddr, dataLen, pWriteBuf);
-		if(isNoWrite) {
-			SEND_MSG(_ET("No Write LBA"));
-		} else {
-			SEND_MSG(_ET("Write LBA (0x%x), secCnt=0x%X"), lbaAddr, secCnt);
-			lbaWrite(lbaAddr, secCnt, pWriteBuf);
-			vdrReboot();
-		}
 
-		if(isNoRead == true) {
-			continue;
-		}
 
-		SEND_MSG(_ET("Read  LBA (0x%x), secCnt=0x%X"), lbaAddr, secCnt);
-		lbaRead(lbaAddr, secCnt, pReadBuf);
+		bool res = execSeqOnce(lbaAddr, secCnt, isNoWrite, isNoRead, m_writeBuf, m_readBuf);
 
-		result = memcmp(pReadBuf, pWriteBuf, dataLen);
-
-		//印出哪裡有問題
-		if(result != 0) {
-			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, howManyStep, pWriteBuf, pReadBuf);
-            SEND_MSG_ESTR(msg);
+		if (res == false) {
+			SEND_MSG(_ET("Verify ... fail"));
+			msg = genErrorMsg(startLba, endLba, secCnt, lbaAddr, step, step, m_writeBuf, m_readBuf);
+			SEND_MSG_ESTR_CTRL(msg, true, false);
 			return false;
 		}
 
-
-        SEND_MSG(_ET("Verify .. Pass"));
-		howManyStep++;
+		SEND_MSG(_ET("Verify ... Pass"));
+	
 	}
     SEND_MSG(_ET("Finish"));
 	return true;
