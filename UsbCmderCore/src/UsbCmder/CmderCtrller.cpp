@@ -6,6 +6,10 @@
 #include "SequenceWrite/SequenceWrite.h"
 #include "RandomWrite/RandomWrite.h"
 
+#include "WriteReadTest/TestControl.h"
+
+
+
 #include "ScsiUtility/ScsiCmd.h"
 #include "ScsiUtility/ScsiFun.h"
 
@@ -14,13 +18,47 @@
 #include "Utility/EricException.h"
 #include "Utility/Singleton.h"
 
+#include "UtilityDialog/IniUtility.h"
+
+#include "winioctl.h"          //todo: for BusTypeUsb, need remove
 
 
 #define NULL_32 (0xFFFFFFFF)
+estring m_checkInquiryString;
+eu32 m_checkBusType;
+eu32 m_scantype;
+
+bool check_inquiry_string(DeviceInfo& deviceInfo) {
+	Utility u;
+	ScsiIf scsi(deviceInfo.handle, _ET(""), _ET(""));
+
+	eu8 databuf[0x24];
+	scsi.inquiry(databuf);
+
+	deviceInfo.description = u.toString(databuf + 8, sizeof(databuf) - 8);
+
+	size_t found = deviceInfo.description.find(m_checkInquiryString);
+
+	if (found == NULL_32) {
+		return false;
+	}
+	return true;
+}
+
+bool check_bus_type(DeviceInfo& deviceInfo) {
+	if (deviceInfo.busType == m_checkBusType) {
+		return true;
+	}
+	return false;
+}
 
 bool check_filter(DeviceInfo& deviceInfo) {
 	ScsiFun scsiFun;
-	if (scsiFun.is_usb_bus_type(deviceInfo) == false) {
+	if (check_bus_type(deviceInfo) == false) {
+		return false;
+	}
+
+	if (check_inquiry_string(deviceInfo) == false) {
 		return false;
 	}
 	return true;
@@ -72,19 +110,19 @@ eu32 CmderCtrller::toLba(ScsiCmd cmd) {
 }
 
 void CmderCtrller::executeUsbCmd(ScsiCmd cmd) {
-	memset(pc_buffer, 0xcc, sizeof(pc_buffer)); // init buffer
+	memset(m_executeBuf, 0xcc, sizeof(m_executeBuf)); // init buffer
 	if(cmd.cdb[0] == UFI_OP_WRITE_10) {
-		m_u.makeBuf(toLba(cmd), cmd.length, pc_buffer);
+		m_u.makeBuf(toLba(cmd), cmd.length, m_executeBuf);
 	}
 
 	ScsiIf usbCmd = get_cmdif();
-    usbCmd.send_cmd(cmd, pc_buffer);
+    usbCmd.send_cmd(cmd, m_executeBuf);
 
     Utility su;
-	estring msg = su.makeHexTable(cmd.length, pc_buffer);
+	estring msg = su.makeHexTable(cmd.length, m_executeBuf);
 	SEND_MSG_CTRL(false, true, msg.c_str());
 
-	estring asciiMsg = su.makeAsciiTable(pc_buffer, cmd.length);
+	estring asciiMsg = su.makeAsciiTable(m_executeBuf, cmd.length);
 	m_view.sendMsgToAsciiArea(true, asciiMsg);
 }
 
@@ -104,7 +142,7 @@ eu32 CmderCtrller::getCapacity() {
 	return res;
 }
 
-void CmderCtrller::seEndLba() {
+void CmderCtrller::setEndLba() {
 	CmderView* view = &m_view;
 	if (view->m_seqWriteUi.getEndLba() == NULL_32) {
 		eu32 strEndLba = getCapacity();
@@ -116,7 +154,7 @@ void CmderCtrller::seEndLba() {
 void CmderCtrller::squenceWrite() {
 	CmderView* view = &m_view;
 	ScsiIf usbCmd = get_cmdif();
-	seEndLba();
+	setEndLba();
 	
 	SequenceWrite sw(usbCmd);
 	sw.sequenceWrite(view->m_seqWriteUi);
@@ -125,7 +163,7 @@ void CmderCtrller::squenceWrite() {
 void CmderCtrller::randomWrite() {
 	CmderView* view = &m_view;
 	ScsiIf usbCmd = get_cmdif();
-	seEndLba();
+	setEndLba();
 	
 	RandomWrite rw(usbCmd);
 	rw.randomWrite(m_view.m_rdmWriteUi);
@@ -143,7 +181,17 @@ void CmderCtrller::refresh() {
     m_view.set_device_box(m_scsiFun.get_device_description());
 }
 
+void CmderCtrller::load_option() {
+	IniUtility iniU(_ET("./UsbCommander.ini"));
+	estring appname = _ET("General");
+	
+	m_scantype = iniU.getInt(appname, _ET("ScanType"), ScanType::driveLetter);
+	m_checkInquiryString = iniU.getString(appname, _ET("CheckInquiryString"));
+	m_checkBusType = iniU.getInt(appname, _ET("CheckBusType"), BusTypeUsb);
+}
+
 void CmderCtrller::init() {
+	load_option();
     m_view.init();
     refresh();
 	m_CmdIf.init_disk();
@@ -156,4 +204,10 @@ void CmderCtrller::close() {
 
 void CmderCtrller::driverChange() {
 	m_view.driveSelectChange();
+}
+
+void CmderCtrller::exec_script() {
+	TestControl tc;
+	ScsiIf usbCmd = get_cmdif();
+	tc.exec_script(usbCmd, m_view);
 }

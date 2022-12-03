@@ -158,6 +158,9 @@
     <ClInclude Include="src\UsbCmder\CmderCtrller.h" />
     <ClInclude Include="src\UsbCmder\CmderModel.h" />
     <ClInclude Include="src\UsbCmder\CmderView.h" />
+    <ClInclude Include="src\WriteReadTest\NormalTest.h" />
+    <ClInclude Include="src\WriteReadTest\TestControl.h" />
+    <ClInclude Include="src\WriteReadTest\WriteReadCmp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -169,6 +172,9 @@
     <ClCompile Include="src\UsbCmder\CmderCtrller.cpp" />
     <ClCompile Include="src\UsbCmder\CmderModel.cpp" />
     <ClCompile Include="src\UsbCmder\CmderView.cpp" />
+    <ClCompile Include="src\WriteReadTest\NormalTest.cpp" />
+    <ClCompile Include="src\WriteReadTest\TestControl.cpp" />
+    <ClCompile Include="src\WriteReadTest\WriteReadCmp.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
